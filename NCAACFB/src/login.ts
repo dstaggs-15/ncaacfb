@@ -72,12 +72,23 @@ export function setupLoginPage() {
   const message = document.querySelector<HTMLParagraphElement>('#message')!
 
   document.querySelector('#login-btn')!.addEventListener('click', async () => {
+    message.textContent = 'Logging in...'
+    let secondsLeft = 3
+
     const { error } = await signIn(email(), password())
+
     if (error) {
       message.textContent = error.message
     } else {
-      message.textContent = 'Logged in!'
-      window.location.href = '/'
+      message.textContent = 'Logged in! Redirecting in ${secondsLeft} seconds...'
+      const countdown =- setInterval(() => {
+        secondsLeft--
+        message.textContent = 'Logged in! Redirecting in ${secondsLeft} seconds...'
+        if (secondsLeft <= 0) {
+          clearInterval(countdown)
+          window.location.href = '/home/'
+        }
+      }, 1000)
     }
   })
 
