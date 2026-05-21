@@ -6,6 +6,7 @@ export default defineConfig({
       input: {
         main: 'index.html',
         dynasty: 'dynasty/index.html',
+        dynastyAdd: 'dynasty/add/index.html',
         blogger: 'blogger/index.html',
       }
     }
