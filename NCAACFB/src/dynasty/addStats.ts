@@ -16,7 +16,7 @@ async function init() {
       max-width: 600px;
       margin: 0 auto;
     ">
-      <a href="/dynasty/" style="color: #D4A017; text-decoration: none;">← Back to Dynasty</a>
+      <a href="/home/" style="color: #D4A017; text-decoration: none;">← Back to Home</a>
       <h1 style="margin: 24px 0 8px;">Add Stats</h1>
       <p style="color: #888; margin-bottom: 40px;">Submit game results, seasons, and trophies</p>
 
