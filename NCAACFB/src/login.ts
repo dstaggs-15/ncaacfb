@@ -80,10 +80,10 @@ export function setupLoginPage() {
     if (error) {
       message.textContent = error.message
     } else {
-      message.textContent = 'Logged in! Redirecting in ${secondsLeft} seconds...'
+      message.textContent = `Logged in! Redirecting in ${secondsLeft} seconds...`
       const countdown =- setInterval(() => {
         secondsLeft--
-        message.textContent = 'Logged in! Redirecting in ${secondsLeft} seconds...'
+        message.textContent = `Logged in! Redirecting in ${secondsLeft} seconds...`
         if (secondsLeft <= 0) {
           clearInterval(countdown)
           window.location.href = '/home/'
