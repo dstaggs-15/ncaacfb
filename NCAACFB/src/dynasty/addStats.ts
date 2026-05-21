@@ -18,12 +18,13 @@ async function init() {
     ">
       <a href="/home/" style="color: #D4A017; text-decoration: none;">← Back to Home</a>
       <h1 style="margin: 24px 0 8px;">Add Stats</h1>
-      <p style="color: #888; margin-bottom: 40px;">Submit game results, seasons, and trophies</p>
+      <p style="color: #888; margin-bottom: 40px;">Submit game results, seasons, trophies, and teams</p>
 
-      <div style="display: flex; gap: 12px; margin-bottom: 32px;">
+      <div style="display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap;">
         <button id="tab-game" style="padding: 10px 20px; background: #D4A017; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Game Result</button>
         <button id="tab-season" style="padding: 10px 20px; background: #222; color: white; border: none; border-radius: 8px; cursor: pointer;">New Season</button>
         <button id="tab-trophy" style="padding: 10px 20px; background: #222; color: white; border: none; border-radius: 8px; cursor: pointer;">Trophy</button>
+        <button id="tab-team" style="padding: 10px 20px; background: #222; color: white; border: none; border-radius: 8px; cursor: pointer;">Team Logo</button>
       </div>
 
       <div id="form-area"></div>
@@ -85,9 +86,26 @@ async function init() {
     </div>
   `
 
+  const teamForm = `
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <select id="dynasty-select-team" style="padding: 12px; background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 8px;">
+        ${dynastyOptions}
+      </select>
+      <input id="team-name" type="text" placeholder="Team Name (e.g. Alabama)" style="padding: 12px; background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 8px;" />
+      <input id="team-conference" type="text" placeholder="Conference (e.g. SEC)" style="padding: 12px; background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 8px;" />
+      <label style="color: #888; font-size: 14px;">Team Logo</label>
+      <input id="team-logo" type="file" accept="image/*" style="padding: 12px; background: #1a1a1a; color: white; border: 1px solid #333; border-radius: 8px;" />
+      <div id="logo-preview" style="display: none; margin-top: 8px;">
+        <img id="preview-img" style="width: 80px; height: 80px; object-fit: contain; border-radius: 8px; background: #1a1a1a; padding: 8px;" />
+      </div>
+      <button id="submit-team" style="padding: 12px; background: #D4A017; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Submit Team</button>
+    </div>
+  `
+
   const formArea = document.querySelector<HTMLDivElement>('#form-area')!
   const statusMsg = document.querySelector<HTMLParagraphElement>('#status-msg')!
   formArea.innerHTML = gameForm
+  attachGameSubmit()
 
   document.querySelector('#tab-game')!.addEventListener('click', () => {
     formArea.innerHTML = gameForm
@@ -101,8 +119,10 @@ async function init() {
     formArea.innerHTML = trophyForm
     attachTrophySubmit()
   })
-
-  attachGameSubmit()
+  document.querySelector('#tab-team')!.addEventListener('click', () => {
+    formArea.innerHTML = teamForm
+    attachTeamSubmit()
+  })
 
   function attachGameSubmit() {
     document.querySelector('#submit-game')?.addEventListener('click', async () => {
@@ -126,7 +146,7 @@ async function init() {
         is_playoff: isPlayoff
       })
 
-      statusMsg.textContent = error ? error.message : 'Game submitted!'
+      statusMsg.textContent = error ? error.message : '✅ Game submitted!'
     })
   }
 
@@ -142,7 +162,7 @@ async function init() {
         is_current: isCurrent
       })
 
-      statusMsg.textContent = error ? error.message : 'Season created!'
+      statusMsg.textContent = error ? error.message : '✅ Season created!'
     })
   }
 
@@ -160,7 +180,58 @@ async function init() {
         trophy_name: trophyName
       })
 
-      statusMsg.textContent = error ? error.message : 'Trophy awarded!'
+      statusMsg.textContent = error ? error.message : '✅ Trophy awarded!'
+    })
+  }
+
+  function attachTeamSubmit() {
+    document.querySelector('#team-logo')?.addEventListener('change', (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (file) {
+        const preview = document.querySelector('#logo-preview') as HTMLDivElement
+        const img = document.querySelector('#preview-img') as HTMLImageElement
+        img.src = URL.createObjectURL(file)
+        preview.style.display = 'block'
+      }
+    })
+
+    document.querySelector('#submit-team')?.addEventListener('click', async () => {
+      const dynastyId = (document.querySelector('#dynasty-select-team') as HTMLSelectElement).value
+      const teamName = (document.querySelector('#team-name') as HTMLInputElement).value
+      const conference = (document.querySelector('#team-conference') as HTMLInputElement).value
+      const fileInput = document.querySelector('#team-logo') as HTMLInputElement
+      const file = fileInput.files?.[0]
+
+      statusMsg.textContent = 'Uploading...'
+
+      let logoUrl = null
+
+      if (file) {
+        const fileName = `${Date.now()}-${file.name.replace(/\s/g, '_')}`
+        const { error: uploadError } = await supabase.storage
+          .from('team-logos')
+          .upload(fileName, file)
+
+        if (uploadError) {
+          statusMsg.textContent = uploadError.message
+          return
+        }
+
+        const { data } = supabase.storage
+          .from('team-logos')
+          .getPublicUrl(fileName)
+
+        logoUrl = data.publicUrl
+      }
+
+      const { error } = await supabase.from('teams').insert({
+        dynasty_id: dynastyId,
+        name: teamName,
+        conference: conference,
+        logo_url: logoUrl
+      })
+
+      statusMsg.textContent = error ? error.message : '✅ Team added!'
     })
   }
 }
