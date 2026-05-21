@@ -1,5 +1,9 @@
 # NCAA / CFB 27 Documentation App
 
+*Table of Contents*
+* [Purpose](#purpose)
+* [Instructions](#how-to-run)
+
 ## Purpose
 
 This app is going to keep track of potentially two separate ideas:
