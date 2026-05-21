@@ -1,5 +1,9 @@
 # NCAA / CFB 27 Documentation App
 
+*Table of Contents*
+* [Purpose](#purpose)
+* [Instructions](#how-to-run)
+
 ## Purpose
 
 This app is going to keep track of potentially two separate ideas:
@@ -10,3 +14,10 @@ This app is going to keep track of potentially two separate ideas:
     - **H2H**. Head-To-Head records will also be recorded (if in a multiplayer dynasty) because it is always fun to remind someone you beat them repeatedly year-in and year-out.
   - **Player Stats**. Sometimes its fun to look back at how amazing your players were statistically. This is optional but a fun inclusion. 
 - The second idea is a blogging post creator. The creator will take events given to it and add dramatization to further improve the immersion into games and/or dynasties.
+
+## How to Run
+
+* Change directories to look like this in the terminal: `~/ncaacfb/NCAACFB/`.
+* Run the command `npm install`.
+* Run the command `npm run dev`.
+* A local host should appear in the terminal to view the webpage. Type that in new web window or ctrl+click in the terminal.
