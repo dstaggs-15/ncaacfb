@@ -86,7 +86,7 @@ export function setupLoginPage() {
         message.textContent = `Logged in! Redirecting in ${secondsLeft} seconds...`
         if (secondsLeft <= 0) {
           clearInterval(countdown)
-          window.location.href = 'home'
+          window.location.href = '/'
         }
       }, 1000)
     }
