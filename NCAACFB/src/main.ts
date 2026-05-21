@@ -4,13 +4,7 @@ import { setupLoginPage } from './login'
 
 async function init() {
   const path = window.location.pathname
-
   const user = await getUser()
-
-  if (!user && path !== '/') {
-    window.location.href = '/'
-    return
-  }
 
   if (!user) {
     setupLoginPage()
@@ -19,6 +13,13 @@ async function init() {
 
   if (path === '/' || path === '') {
     window.location.href = '/home/'
+    return
+  }
+
+  if (path.startsWith('/home')) {
+    const { setupHomePage } = await import('./home/home')
+    setupHomePage()
+    return
   }
 }
 
