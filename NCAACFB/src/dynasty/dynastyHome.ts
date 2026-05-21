@@ -3,22 +3,21 @@ import { getActiveDynasty } from "./dynastyData";
 
 async function init() {
   const dynasty = await getActiveDynasty();
-
   const dynastyName = dynasty?.name ?? "No Active Dynasty";
   const dynastyStatus = dynasty?.is_active ? "Active" : "Inactive";
-
   const app = document.querySelector<HTMLDivElement>("#dynasty-app");
   if (!app) {
     throw new Error("Could not find #dynasty-app");
   }
-
   app.innerHTML = `
     <main class="dynasty-page">
       <nav class="dynasty-nav">
-        <a href="/">NCAACFB</a>
+        <a href="/home/">← Home</a>
         <div>
           <a href="/dynasty/">Dynasty</a>
           <a href="/blogger/">Blogger</a>
+          <a href="/dynasty/add/">+ Add Stats</a>
+          <a href="#" id="logout-btn" style="color: #f87171;">Log Out</a>
         </div>
       </nav>
       <section class="dynasty-hero">
@@ -85,6 +84,13 @@ async function init() {
       </section>
     </main>
   `;
+
+  document.querySelector('#logout-btn')?.addEventListener('click', async (e) => {
+    e.preventDefault()
+    const { signOut } = await import('../auth')
+    await signOut()
+    window.location.href = '/'
+  })
 }
 
 init();
