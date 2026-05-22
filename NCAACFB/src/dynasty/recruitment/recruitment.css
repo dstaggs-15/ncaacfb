@@ -160,7 +160,7 @@
 
 .pitch-label {
   color: #e6e6e6;
-  font-size: 17px;
+  font-size: 14px;
   font-weight: 700;
   text-shadow: 1px 1px 1px #000;
   white-space: nowrap;
@@ -197,7 +197,7 @@
   }
 
   .motivation-icon {
-    height: 120px;
+    height: 600px;
   }
 
   .pitch-row {
