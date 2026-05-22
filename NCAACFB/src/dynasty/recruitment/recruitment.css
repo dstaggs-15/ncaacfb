@@ -4,72 +4,41 @@
 }
 
 .recruitment-card {
-  width: min(1180px, calc(100vw - 32px));
-  max-width: 1180px;
-}
-
-.recruitment-header {
-  margin-bottom: 24px;
-}
-
-.recruitment-subtitle {
-  margin: 8px 0 0;
-  color: #a7b0c0;
-  font-size: 15px;
-  line-height: 1.4;
+  width: min(1240px, calc(100vw - 48px));
+  max-width: 1240px;
+  overflow: hidden;
 }
 
 .recruitment-shell {
   display: grid;
-  grid-template-columns: minmax(620px, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) 340px;
   gap: 22px;
   align-items: start;
 }
 
 .motivation-grid-section,
 .recruitment-filter-panel {
+  min-width: 0;
   border: 1px solid rgba(212, 160, 23, 0.25);
   border-radius: 18px;
   background: rgba(17, 24, 39, 0.62);
   padding: 20px;
 }
 
-.recruitment-filter-panel h2 {
-  margin: 0 0 6px;
-  color: #f4f5f6;
-  font-size: 22px;
-}
-
 .motivation-grid {
   display: grid;
-  grid-template-columns: repeat(5, 140px);
-  gap: 26px 13px;
+  grid-template-columns: repeat(5, minmax(105px, 1fr));
+  gap: 24px 12px;
 }
 
 .motivation-card {
-  width: 140px;
+  min-width: 0;
 }
 
 .motivation-icon {
-  height: 140px;
-  display: grid;
-  place-items: center;
-  border: 1px solid #333;
-  background:
-    linear-gradient(rgba(70, 74, 70, 0.9), rgba(56, 60, 56, 0.9)),
-    #3f443f;
-  color: #c9c9c9;
-  font-size: 58px;
-  font-weight: 900;
-  filter: grayscale(1);
-  transition:
-    opacity 0.15s ease,
-    filter 0.15s ease,
-    border-color 0.15s ease,
-    background 0.15s ease,
-    color 0.15s ease,
-    box-shadow 0.15s ease,
-    transform 0.15s ease;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  height: auto;
 }
 
 .motivation-label {
@@ -79,6 +48,8 @@
   font-weight: 800;
   text-align: center;
   text-shadow: 1px 1px 1px #000;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .motivation-card.neutral .motivation-icon {
@@ -244,4 +215,25 @@
   color: #cfcfcf;
   font-size: 14px;
   font-weight: 700;
+}
+
+@media (max-width: 1050px) {
+  .recruitment-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .recruitment-filter-panel {
+    order: -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .recruitment-card {
+    width: min(100%, calc(100vw - 24px));
+    padding: 20px;
+  }
+
+  .motivation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
