@@ -1,15 +1,10 @@
 import "../style.css";
 import { supabase } from "../supabase";
 
-export default async function init() {
-  // Check login
+async function showDynasty() {
   const { data: { session } } = await supabase.auth.getSession()
-  if (!session) {
-    window.location.href = '/'
-    return
-  }
+  if (!session) return false
 
-  // Get dynasties directly
   const { data: memberships } = await supabase
     .from('dynasty_members')
     .select('dynasty_id')
@@ -32,7 +27,7 @@ export default async function init() {
   }
 
   const app = document.querySelector<HTMLDivElement>('#app')!
-  if (!app) return
+  if (!app) return false
 
   app.innerHTML = `
     <main class="dynasty-page">
@@ -113,4 +108,37 @@ export default async function init() {
     await supabase.auth.signOut()
     window.location.href = '/'
   })
+
+  return true
+}
+
+async function showLogin() {
+  const app = document.querySelector<HTMLDivElement>('#app')!
+  app.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#0a0a0a;color:white;font-family:system-ui;padding:20px;">
+      <h1 style="margin-bottom:8px;">CFB Dynasty</h1>
+      <p style="color:#888;margin-bottom:32px;">Sign in to continue</p>
+      <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:360px;background:#1a1a1a;padding:32px;border-radius:12px;">
+        <input id="email" type="email" placeholder="Email" style="padding:12px;background:#111;color:white;border:1px solid #333;border-radius:8px;font-size:16px;" />
+        <input id="password" type="password" placeholder="Password" style="padding:12px;background:#111;color:white;border:1px solid #333;border-radius:8px;font-size:16px;" />
+        <button id="login-btn" style="padding:12px;background:#D4A017;color:black;border:none;border-radius:8px;font-weight:bold;font-size:16px;cursor:pointer;">Log In</button>
+        <p id="msg" style="color:#888;text-align:center;font-size:14px;margin:0;"></p>
+      </div>
+    </div>
+  `
+
+  document.querySelector('#login-btn')?.addEventListener('click', async () => {
+    const email = (document.querySelector('#email') as HTMLInputElement).value
+    const password = (document.querySelector('#password') as HTMLInputElement).value
+    const msg = document.querySelector('#msg')!
+    msg.textContent = 'Signing in...'
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) { msg.textContent = error.message; return }
+    await showDynasty()
+  })
+}
+
+export default async function init() {
+  const loaded = await showDynasty()
+  if (!loaded) await showLogin()
 }
