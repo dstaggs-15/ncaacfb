@@ -1,16 +1,43 @@
 .recruitment-page {
-  min-height: 100vh;
-  padding: 28px 32px;
-  background: #111;
-  color: #f5f5f5;
-  font-family: system-ui, sans-serif;
+  align-items: center;
+  justify-content: center;
+}
+
+.recruitment-card {
+  width: min(1180px, calc(100vw - 32px));
+  max-width: 1180px;
+}
+
+.recruitment-header {
+  margin-bottom: 24px;
+}
+
+.recruitment-subtitle {
+  margin: 8px 0 0;
+  color: #a7b0c0;
+  font-size: 15px;
+  line-height: 1.4;
 }
 
 .recruitment-shell {
   display: grid;
-  grid-template-columns: minmax(620px, 760px) 380px;
-  gap: 26px;
+  grid-template-columns: minmax(620px, 1fr) 360px;
+  gap: 22px;
   align-items: start;
+}
+
+.motivation-grid-section,
+.recruitment-filter-panel {
+  border: 1px solid rgba(212, 160, 23, 0.25);
+  border-radius: 18px;
+  background: rgba(17, 24, 39, 0.62);
+  padding: 20px;
+}
+
+.recruitment-filter-panel h2 {
+  margin: 0 0 6px;
+  color: #f4f5f6;
+  font-size: 22px;
 }
 
 .motivation-grid {
