@@ -1,6 +1,6 @@
-import "../style.css";
-import { supabase } from "../supabase";
-import { getAllDynasties } from "./dynastyData";
+import "../../src/style.css";
+import { supabase } from "../../src/supabase";
+import { getAllDynasties } from "../../src/dynasty/dynastyData";
 
 async function init() {
   const app = document.querySelector<HTMLDivElement>("#seasons-app")!;
