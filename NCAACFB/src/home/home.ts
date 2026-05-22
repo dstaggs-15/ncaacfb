@@ -1,4 +1,4 @@
-import homeHtml from './home/index.html?raw'
+import homeHtml from './home.html?raw'
 
 export function setupHomePage() {
   document.querySelector<HTMLDivElement>('#app')!.innerHTML = homeHtml
