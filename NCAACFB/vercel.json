@@ -1,5 +1,7 @@
 {
   "rewrites": [
+    { "source": "/dynasty/(.*)", "destination": "/dynasty/index.html" },
+    { "source": "/blogger/(.*)", "destination": "/blogger/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
