@@ -869,6 +869,7 @@ code {
 #dynasty-btn {
   background: #1a472a;
   color: #f4f5f6;
+  border-color: rgba(255,255,255,0.08);
 }
 
 #blogger-btn {
@@ -884,10 +885,10 @@ code {
 }
 
 #logout-btn {
-  width: 100%;
+  width: 60%;
   min-height: 48px;
   border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px;
+  border-radius: 10px;
   background: #252525;
   color: #9b9b9b;
   font-size: 15px;
