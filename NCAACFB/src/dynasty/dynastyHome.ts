@@ -3,14 +3,13 @@ import { getActiveDynasty } from "./dynastyData";
 import { supabase } from "../supabase";
 
 async function init() {
-  // Wait for auth state to be ready
   await new Promise<void>((resolve) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) { resolve(); return; }
       const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
         if (session) { subscription.unsubscribe(); resolve(); }
       })
-      setTimeout(resolve, 3000) // fallback after 3s
+      setTimeout(resolve, 3000)
     })
   })
 
@@ -23,8 +22,8 @@ async function init() {
   const dynasty = await getActiveDynasty();
   const dynastyName = dynasty?.name ?? "No Active Dynasty";
   const dynastyStatus = dynasty?.is_active ? "Active" : "Inactive";
-  const app = document.querySelector<HTMLDivElement>("#dynasty-app");
-  if (!app) throw new Error("Could not find #dynasty-app");
+  const app = document.querySelector<HTMLDivElement>("#app");
+  if (!app) throw new Error("Could not find #app");
 
   app.innerHTML = `
     <main class="dynasty-page">
@@ -45,7 +44,8 @@ async function init() {
             Track teams, coaches, records, seasons, rivalries, playoff runs, and every bit of digital football folklore your league creates.
           </p>
           <div class="hero-actions">
-            <a class="primary-button" href="/dynasty/dynasties/">View Dynasties</a>
+            <a class="primary-button" href="/dynasty/seasons/">View Seasons</a>
+            <a class="secondary-button" href="/dynasty/teams/">View Teams</a>
           </div>
         </div>
         <aside class="scoreboard-card">
@@ -109,4 +109,4 @@ async function init() {
   })
 }
 
-init();
+export default init;
