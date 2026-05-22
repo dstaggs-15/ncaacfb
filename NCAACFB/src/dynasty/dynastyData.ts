@@ -1,6 +1,9 @@
 import { supabase } from '../supabase'
 
 export async function getActiveDynasty() {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return null
+
   const { data, error } = await supabase
     .from('dynasties')
     .select('*')
@@ -13,6 +16,9 @@ export async function getActiveDynasty() {
 }
 
 export async function getAllDynasties() {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return []
+
   const { data, error } = await supabase
     .from('dynasties')
     .select('*')
@@ -23,6 +29,9 @@ export async function getAllDynasties() {
 }
 
 export async function getCurrentSeason(dynastyId: string) {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return null
+
   const { data, error } = await supabase
     .from('seasons')
     .select('*')
