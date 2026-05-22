@@ -258,12 +258,24 @@ function renderMotivations() {
     return
   }
 
+  const hasActiveSelections = Object.keys(selectedPitches).length > 0
+
   grid.innerHTML = motivations
     .map((motivation) => {
       const possible = motivationIsPossible(motivation)
 
+      let cardStateClass = 'neutral'
+
+      if (hasActiveSelections && possible) {
+        cardStateClass = 'possible'
+      }
+
+      if (hasActiveSelections && !possible) {
+        cardStateClass = 'impossible'
+      }
+
       return `
-        <article class="motivation-card ${possible ? 'possible' : 'impossible'}">
+        <article class="motivation-card ${cardStateClass}">
           <div class="motivation-icon">
             ${motivation.icon}
           </div>

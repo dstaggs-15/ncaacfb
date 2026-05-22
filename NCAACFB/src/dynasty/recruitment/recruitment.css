@@ -39,6 +39,9 @@
     opacity 0.15s ease,
     filter 0.15s ease,
     border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
     transform 0.15s ease;
 }
 
@@ -51,19 +54,45 @@
   text-shadow: 1px 1px 1px #000;
 }
 
+.motivation-card.neutral .motivation-icon {
+  opacity: 1;
+  border-color: #333;
+  background:
+    linear-gradient(rgba(70, 74, 70, 0.9), rgba(56, 60, 56, 0.9)),
+    #3f443f;
+  color: #c9c9c9;
+  filter: grayscale(1);
+}
+
 .motivation-card.possible .motivation-icon {
   opacity: 1;
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: #00d26a;
+  background:
+    linear-gradient(rgba(21, 128, 61, 0.95), rgba(22, 101, 52, 0.95)),
+    #166534;
+  color: #ecfdf5;
+  filter: none;
+  box-shadow:
+    0 0 0 1px rgba(34, 197, 94, 0.3),
+    0 0 18px rgba(34, 197, 94, 0.28);
 }
 
 .motivation-card.impossible .motivation-icon {
-  opacity: 0.28;
+  opacity: 0.32;
+  border-color: #333;
+  background:
+    linear-gradient(rgba(42, 42, 42, 0.95), rgba(28, 28, 28, 0.95)),
+    #222;
+  color: #777;
+  filter: grayscale(1);
 }
 
 .motivation-card.possible:hover .motivation-icon {
   transform: translateY(-2px);
-  border-color: rgba(0, 140, 255, 0.85);
-  box-shadow: 0 0 14px rgba(0, 140, 255, 0.28);
+  border-color: #22c55e;
+  box-shadow:
+    0 0 0 1px rgba(34, 197, 94, 0.45),
+    0 0 24px rgba(34, 197, 94, 0.36);
 }
 
 .recruitment-filter-panel {
