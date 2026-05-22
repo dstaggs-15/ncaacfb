@@ -374,12 +374,30 @@ function getYesCount() {
 }
 
 function motivationIsPossible(motivation: Motivation) {
-  for (const [inputId, selectedValue] of Object.entries(selectedPitches)) {
-    const requiredValue = motivation.conditions[inputId]
+  const selectedYesInputs = Object.entries(selectedPitches)
+    .filter(([, value]) => value === 'yes')
+    .map(([inputId]) => inputId)
 
-    if (requiredValue && requiredValue !== selectedValue) {
-      return false
-    }
+  const selectedNoInputs = Object.entries(selectedPitches)
+    .filter(([, value]) => value === 'no')
+    .map(([inputId]) => inputId)
+
+  const motivationRequiredInputs = Object.keys(motivation.conditions)
+
+  const blockedByNoSelection = selectedNoInputs.some((inputId) =>
+    motivationRequiredInputs.includes(inputId)
+  )
+
+  if (blockedByNoSelection) {
+    return false
+  }
+
+  const missingYesSelection = selectedYesInputs.some((inputId) =>
+    !motivationRequiredInputs.includes(inputId)
+  )
+
+  if (missingYesSelection) {
+    return false
   }
 
   return true
