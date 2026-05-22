@@ -379,6 +379,7 @@ code {
 }
 
 .home-title {
+  min-height: 60px;
   margin: 8px;
   font-size: clamp(42px, 8vw, 72px);
 }
