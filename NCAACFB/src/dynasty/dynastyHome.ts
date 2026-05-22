@@ -1,7 +1,15 @@
 import "../style.css";
 import { getActiveDynasty } from "./dynastyData";
+import { supabase } from "../supabase";
 
 async function init() {
+  const { data: { session } } = await supabase.auth.getSession()
+  
+  if (!session) {
+    window.location.href = '/'
+    return
+  }
+
   const dynasty = await getActiveDynasty();
   const dynastyName = dynasty?.name ?? "No Active Dynasty";
   const dynastyStatus = dynasty?.is_active ? "Active" : "Inactive";
