@@ -1,29 +1,38 @@
 import "../style.css";
-import { getActiveDynasty } from "./dynastyData";
 import { supabase } from "../supabase";
 
-async function init() {
-  await new Promise<void>((resolve) => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) { resolve(); return; }
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-        if (session) { subscription.unsubscribe(); resolve(); }
-      })
-      setTimeout(resolve, 3000)
-    })
-  })
-
+export default async function init() {
+  // Check login
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) {
     window.location.href = '/'
     return
   }
 
-  const dynasty = await getActiveDynasty();
-  const dynastyName = dynasty?.name ?? "No Active Dynasty";
-  const dynastyStatus = dynasty?.is_active ? "Active" : "Inactive";
-  const app = document.querySelector<HTMLDivElement>("#app");
-  if (!app) throw new Error("Could not find #app");
+  // Get dynasties directly
+  const { data: memberships } = await supabase
+    .from('dynasty_members')
+    .select('dynasty_id')
+    .eq('profile_id', session.user.id)
+
+  let dynastyName = 'No Active Dynasty'
+  let dynastyStatus = 'Inactive'
+
+  if (memberships && memberships.length > 0) {
+    const { data: dynasty } = await supabase
+      .from('dynasties')
+      .select('*')
+      .eq('id', memberships[0].dynasty_id)
+      .single()
+
+    if (dynasty) {
+      dynastyName = dynasty.name
+      dynastyStatus = dynasty.is_active ? 'Active' : 'Inactive'
+    }
+  }
+
+  const app = document.querySelector<HTMLDivElement>('#app')!
+  if (!app) return
 
   app.innerHTML = `
     <main class="dynasty-page">
@@ -83,9 +92,7 @@ async function init() {
         <div>
           <p class="eyebrow">Latest Chronicle</p>
           <h2>Build the story as the dynasty unfolds</h2>
-          <p>
-            Add results, notes, awards, playoff drama, coaching changes, and rivalry moments here later.
-          </p>
+          <p>Add results, notes, awards, playoff drama, coaching changes, and rivalry moments here later.</p>
         </div>
         <div class="activity-list">
           <div class="activity-item">
@@ -99,14 +106,11 @@ async function init() {
         </div>
       </section>
     </main>
-  `;
+  `
 
   document.querySelector('#logout-btn')?.addEventListener('click', async (e) => {
     e.preventDefault()
-    const { signOut } = await import('../auth')
-    await signOut()
+    await supabase.auth.signOut()
     window.location.href = '/'
   })
 }
-
-export default init;
