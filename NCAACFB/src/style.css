@@ -396,6 +396,7 @@ code {
 }
 
 .home-card {
+  position: relative;
   width: min(760px, 100%);
   padding: 48px;
   border: 1px solid rgba(212, 160, 23, 0.18);
@@ -403,6 +404,7 @@ code {
   background: rgba(18, 18, 18, 0.92);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
   text-align: center;
+  z-index: 2;
 }
 
 .home-header {
