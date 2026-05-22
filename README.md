@@ -21,3 +21,9 @@ This app is going to keep track of potentially two separate ideas:
 * Run the command `npm install`.
 * Run the command `npm run dev`.
 * A local host should appear in the terminal to view the webpage. Type that in new web window or ctrl+click in the terminal.
+
+### Extras
+
+There are additional tools that will be hidden throughout the testing. 
+
+One of the tools is the recruting tool for Hard/Soft Sell for recruits. This is currently found in https://ncaacfb.vercel.app/dynasty/recruitment.
