@@ -379,7 +379,7 @@ code {
 }
 
 .home-title {
-  margin: 0;
+  margin: 8px;
   font-size: clamp(42px, 8vw, 72px);
   line-height: 0.95;
   letter-spacing: -0.06em;
