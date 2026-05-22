@@ -47,9 +47,9 @@ async function init() {
   }
 
   if (path.startsWith('/dynasty/recruitment')) {
-  const { setupRecruitmentPage } = await import('./dynasty/recruitment/recruitment')
-  setupRecruitmentPage()
-  return
+    const { setupRecruitmentPage } = await import('./dynasty/recruitment/recruitment')
+    setupRecruitmentPage()
+    return
   }
 
   if (path.startsWith('/dynasty')) {
