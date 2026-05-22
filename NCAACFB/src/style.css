@@ -464,7 +464,7 @@ code {
 
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
-  background: #6b2020;
+  background: #6b2020 !important;
   color: #9b9b9b;
   font-size: 15px;
   cursor: pointer;
