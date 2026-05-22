@@ -21,6 +21,31 @@ async function init() {
     setupHomePage()
     return
   }
+
+  if (path.startsWith('/dynasty/add')) {
+    const { default: initAddStats } = await import('./dynasty/addStats')
+    return
+  }
+
+  if (path.startsWith('/dynasty/seasons')) {
+    const { default: initSeasons } = await import('./dynasty/seasons')
+    return
+  }
+
+  if (path.startsWith('/dynasty/coaches')) {
+    const { default: initCoaches } = await import('./dynasty/coaches')
+    return
+  }
+
+  if (path.startsWith('/dynasty/standings')) {
+    const { default: initStandings } = await import('./dynasty/standings')
+    return
+  }
+
+  if (path.startsWith('/dynasty')) {
+    const { default: initDynasty } = await import('./dynasty/dynastyHome')
+    return
+  }
 }
 
 init()
