@@ -4,29 +4,47 @@ export async function getActiveDynasty() {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return null
 
-  const { data, error } = await supabase
+  // First get dynasty IDs this user is a member of
+  const { data: memberships } = await supabase
     .from('dynasty_members')
-    .select('dynasty_id, dynasties(*)')
+    .select('dynasty_id')
     .eq('profile_id', session.user.id)
-    .limit(1)
+
+  if (!memberships || memberships.length === 0) return null
+
+  const dynastyId = memberships[0].dynasty_id
+
+  // Then fetch that dynasty
+  const { data, error } = await supabase
+    .from('dynasties')
+    .select('*')
+    .eq('id', dynastyId)
     .single()
 
   if (error) return null
-  return (data as any)?.dynasties ?? null
+  return data
 }
 
 export async function getAllDynasties() {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return []
 
-  const { data, error } = await supabase
+  const { data: memberships } = await supabase
     .from('dynasty_members')
-    .select('dynasty_id, dynasties(*)')
+    .select('dynasty_id')
     .eq('profile_id', session.user.id)
-    .order('joined_at', { ascending: false })
+
+  if (!memberships || memberships.length === 0) return []
+
+  const ids = memberships.map((m: any) => m.dynasty_id)
+
+  const { data, error } = await supabase
+    .from('dynasties')
+    .select('*')
+    .in('id', ids)
 
   if (error) return []
-  return data?.map((d: any) => d.dynasties) ?? []
+  return data ?? []
 }
 
 export async function getCurrentSeason(dynastyId: string) {
