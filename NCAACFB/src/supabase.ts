@@ -7,5 +7,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
+    storageKey: 'ncaacfb-auth',
+    storage: window.localStorage
   }
 })
