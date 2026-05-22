@@ -665,9 +665,68 @@ code {
   .blogger-actions {
     flex-direction: column;
   }
+}
 
-  .primary-button,
-  .secondary-button {
-    width: 100%;
-  }
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #0a0a0a;
+  color: white;
+  font-family: system-ui, sans-serif;
+  padding: 24px;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.login-header h1 {
+  font-size: 48px;
+  margin: 0 0 8px;
+}
+
+.login-header p {
+  color: #888;
+  margin: 0;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: #1a1a1a;
+  padding: 40px;
+  border-radius: 12px;
+}
+
+.login-card input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: #111;
+  color: white;
+  font-size: 16px;
+}
+
+.login-card input::placeholder {
+  color: #777;
+}
+
+.login-card input:focus {
+  outline: none;
+  border-color: #d4a017;
+}
+
+.login-message {
+  min-height: 20px;
+  color: #888;
+  text-align: center;
+  font-size: 14px;
+  margin: 0;
 }
