@@ -370,9 +370,9 @@ code {
 }
 
 .home-kicker {
-  margin: 0 0 10px;
+  margin: 10px;
   color: #d4a017;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -396,21 +396,22 @@ code {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
-  margin-bottom: 18px;
+  margin: 12px;
 }
 
 .home-btn {
-  min-height: 126px;
-  padding: 20px;
+  min-height: 80px;
+  min-width: 120px;
+  padding: 8px;
   border: 1px solid transparent;
-  border-radius: 18px;
+  border-radius: 16px;
   cursor: pointer;
-  text-align: left;
+  text-align: center;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 18px;
+  gap: 12px;
 
   transition:
     transform 0.16s ease,
@@ -431,25 +432,25 @@ code {
 }
 
 .home-btn-text {
-  font-size: 13px;
+  font-size: 24px;
   line-height: 1.4;
   opacity: 0.78;
 }
 
 .home-btn-primary {
-  background: #d4a017;
-  color: #070707;
+  background: #1a472a;
+  color: #f3f4f6;
 }
 
 .home-btn-secondary {
-  background: #222;
-  color: white;
+  background: #222222;
+  color: #f3f4f6;
   border-color: rgba(255, 255, 255, 0.08);
 }
 
 .home-btn-add {
-  background: #1a472a;
-  color: white;
+  background: #d4a017;
+  color: #070707;
   border-color: rgba(255, 255, 255, 0.08);
 }
 
