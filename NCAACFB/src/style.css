@@ -455,7 +455,7 @@ code {
 }
 
 .home-logout {
-  width: min(240px, 100%);
+  width: min(180px, 100%);
   min-height: 48px;
   margin: 0 auto;
 
@@ -867,8 +867,8 @@ code {
 }
 
 #dynasty-btn {
-  background: #D4A017;
-  color: black;
+  background: #1a472a;
+  color: #f4f5f6;
 }
 
 #blogger-btn {
@@ -878,8 +878,8 @@ code {
 }
 
 #add-btn {
-  background: #1a472a;
-  color: white;
+  background: #d4a017;
+  color: #f4f5f6;
   border-color: rgba(255,255,255,0.08);
 }
 
