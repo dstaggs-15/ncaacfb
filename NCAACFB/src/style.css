@@ -388,7 +388,7 @@ code {
   max-width: 520px;
   margin: 18px auto 0;
   color: #a3a3a3;
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.6;
 }
 
@@ -843,47 +843,6 @@ code {
   margin: 0;
 }
 
-.home-buttons {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-bottom: 18px;
-}
-
-.home-buttons button {
-  min-height: 126px;
-  padding: 20px;
-  border: 1px solid transparent;
-  border-radius: 18px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  transition: transform 0.16s ease, filter 0.16s ease;
-}
-
-.home-buttons button:hover {
-  transform: translateY(-4px);
-  filter: brightness(1.08);
-}
-
-#dynasty-btn {
-  background: #1a472a;
-  color: #f4f5f6;
-  border-color: rgba(255,255,255,0.08);
-}
-
-#blogger-btn {
-  background: #222;
-  color: white;
-  border-color: rgba(255,255,255,0.08);
-}
-
-#add-btn {
-  background: #d4a017;
-  color: #f4f5f6;
-  border-color: rgba(255,255,255,0.08);
-}
-
 #logout-btn {
   width: 60%;
   min-height: 48px;
@@ -900,8 +859,8 @@ code {
   color: white;
 }
 
-@media (max-width: 620px) {
-  .home-buttons {
+@media (max-width: 700px) {
+  .home-actions {
     grid-template-columns: 1fr;
   }
 }
