@@ -347,7 +347,7 @@ code {
   background:
   radial-gradient(circle at top, rgba(59, 130, 246, 0.16), transparent 30rem),
     radial-gradient(circle at bottom left, rgba(27, 99, 18, 0.12), transparent 32rem),
-    radial-gradient(circle at bottom right, rgba(51, 231, 27, 0.12), transparent 32rem),
+    radial-gradient(circle at bottom right, rgba(27, 99, 18, 0.12), transparent 32rem),
     linear-gradient(180deg, #101010 0%, #070707 100%);
   color: white;
   font-family: system-ui, sans-serif;
