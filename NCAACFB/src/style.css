@@ -453,8 +453,12 @@ code {
 }
 
 .home-logout {
-  width: 100%;
+  width: min(240px, 100%);
   min-height: 48px;
+  margin: 0 auto;
+
+  display: block;
+
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   background: #252525;
