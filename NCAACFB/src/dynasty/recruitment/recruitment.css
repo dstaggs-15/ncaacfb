@@ -39,6 +39,30 @@
   width: 100%;
   aspect-ratio: 1 / 1;
   height: auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #333;
+  background:
+    linear-gradient(rgba(70, 74, 70, 0.9), rgba(56, 60, 56, 0.9)),
+    #3f443f;
+
+  color: #c9c9c9;
+  font-size: clamp(42px, 5vw, 64px);
+  font-weight: 900;
+  line-height: 1;
+
+  filter: grayscale(1);
+  transition:
+    opacity 0.15s ease,
+    filter 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 
 .motivation-label {
@@ -197,7 +221,7 @@
   }
 
   .motivation-icon {
-    height: 600px;
+    height: 120px;
   }
 
   .pitch-row {
