@@ -3,8 +3,18 @@ import { getActiveDynasty } from "./dynastyData";
 import { supabase } from "../supabase";
 
 async function init() {
+  // Wait for auth state to be ready
+  await new Promise<void>((resolve) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) { resolve(); return; }
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session) { subscription.unsubscribe(); resolve(); }
+      })
+      setTimeout(resolve, 3000) // fallback after 3s
+    })
+  })
+
   const { data: { session } } = await supabase.auth.getSession()
-  
   if (!session) {
     window.location.href = '/'
     return
@@ -14,9 +24,8 @@ async function init() {
   const dynastyName = dynasty?.name ?? "No Active Dynasty";
   const dynastyStatus = dynasty?.is_active ? "Active" : "Inactive";
   const app = document.querySelector<HTMLDivElement>("#dynasty-app");
-  if (!app) {
-    throw new Error("Could not find #dynasty-app");
-  }
+  if (!app) throw new Error("Could not find #dynasty-app");
+
   app.innerHTML = `
     <main class="dynasty-page">
       <nav class="dynasty-nav">
