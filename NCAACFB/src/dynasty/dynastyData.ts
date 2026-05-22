@@ -5,14 +5,14 @@ export async function getActiveDynasty() {
   if (!session) return null
 
   const { data, error } = await supabase
-    .from('dynasties')
-    .select('*')
-    .eq('is_active', true)
+    .from('dynasty_members')
+    .select('dynasty_id, dynasties(*)')
+    .eq('profile_id', session.user.id)
     .limit(1)
     .single()
 
   if (error) return null
-  return data
+  return (data as any)?.dynasties ?? null
 }
 
 export async function getAllDynasties() {
@@ -20,12 +20,13 @@ export async function getAllDynasties() {
   if (!session) return []
 
   const { data, error } = await supabase
-    .from('dynasties')
-    .select('*')
-    .order('created_at', { ascending: false })
+    .from('dynasty_members')
+    .select('dynasty_id, dynasties(*)')
+    .eq('profile_id', session.user.id)
+    .order('joined_at', { ascending: false })
 
   if (error) return []
-  return data
+  return data?.map((d: any) => d.dynasties) ?? []
 }
 
 export async function getCurrentSeason(dynastyId: string) {
