@@ -1,0 +1,191 @@
+.recruitment-page {
+  min-height: 100vh;
+  padding: 28px 32px;
+  background: #111;
+  color: #f5f5f5;
+  font-family: system-ui, sans-serif;
+}
+
+.recruitment-shell {
+  display: grid;
+  grid-template-columns: minmax(620px, 760px) 380px;
+  gap: 26px;
+  align-items: start;
+}
+
+.motivation-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 140px);
+  gap: 26px 13px;
+}
+
+.motivation-card {
+  width: 140px;
+}
+
+.motivation-icon {
+  height: 140px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #333;
+  background:
+    linear-gradient(rgba(70, 74, 70, 0.9), rgba(56, 60, 56, 0.9)),
+    #3f443f;
+  color: #c9c9c9;
+  font-size: 58px;
+  font-weight: 900;
+  filter: grayscale(1);
+  transition:
+    opacity 0.15s ease,
+    filter 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.motivation-label {
+  margin-top: 9px;
+  color: #f4f4f4;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.motivation-card.possible .motivation-icon {
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.motivation-card.impossible .motivation-icon {
+  opacity: 0.28;
+}
+
+.motivation-card.possible:hover .motivation-icon {
+  transform: translateY(-2px);
+  border-color: rgba(0, 140, 255, 0.85);
+  box-shadow: 0 0 14px rgba(0, 140, 255, 0.28);
+}
+
+.recruitment-filter-panel {
+  padding-top: 46px;
+}
+
+.recruitment-filter-panel h2 {
+  margin: 0 0 6px;
+  color: white;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.pitch-inputs {
+  display: grid;
+  gap: 5px;
+}
+
+.pitch-row {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.pitch-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.pitch-btn {
+  width: 52px;
+  height: 37px;
+  border-radius: 5px;
+  background: #111;
+  color: white;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    transform 0.12s ease;
+}
+
+.pitch-btn:hover {
+  transform: translateY(-1px);
+}
+
+.pitch-btn.yes {
+  border: 1px solid #00c900;
+}
+
+.pitch-btn.no {
+  border: 1px solid #ff0000;
+}
+
+.pitch-btn.yes.active {
+  background: #00a000;
+  border-color: #00e000;
+}
+
+.pitch-btn.no.active {
+  background: #b00000;
+  border-color: #ff2020;
+}
+
+.pitch-label {
+  color: #e6e6e6;
+  font-size: 17px;
+  font-weight: 700;
+  text-shadow: 1px 1px 1px #000;
+  white-space: nowrap;
+}
+
+@media (max-width: 1080px) {
+  .recruitment-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .recruitment-filter-panel {
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 780px) {
+  .motivation-grid {
+    grid-template-columns: repeat(4, 140px);
+  }
+}
+
+@media (max-width: 620px) {
+  .recruitment-page {
+    padding: 20px;
+  }
+
+  .motivation-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 12px;
+  }
+
+  .motivation-card {
+    width: 100%;
+  }
+
+  .motivation-icon {
+    height: 120px;
+  }
+
+  .pitch-row {
+    grid-template-columns: 112px 1fr;
+  }
+
+  .pitch-label {
+    font-size: 15px;
+    white-space: normal;
+  }
+}
+
+.yes-counter {
+  margin: 0 0 10px;
+  color: #cfcfcf;
+  font-size: 14px;
+  font-weight: 700;
+}
