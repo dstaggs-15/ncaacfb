@@ -24,26 +24,31 @@ async function init() {
 
   if (path.startsWith('/dynasty/add')) {
     const { default: initAddStats } = await import('./dynasty/addStats')
+    await initAddStats()
     return
   }
 
   if (path.startsWith('/dynasty/seasons')) {
     const { default: initSeasons } = await import('./dynasty/seasons')
+    await initSeasons()
     return
   }
 
   if (path.startsWith('/dynasty/coaches')) {
     const { default: initCoaches } = await import('./dynasty/coaches')
+    await initCoaches()
     return
   }
 
   if (path.startsWith('/dynasty/standings')) {
     const { default: initStandings } = await import('./dynasty/standings')
+    await initStandings()
     return
   }
 
   if (path.startsWith('/dynasty')) {
     const { default: initDynasty } = await import('./dynasty/dynastyHome')
+    await initDynasty()
     return
   }
 }
