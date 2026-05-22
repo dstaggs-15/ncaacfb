@@ -46,6 +46,12 @@ async function init() {
     return
   }
 
+  if (path.startsWith('/dynasty/recruitment')) {
+  const { setupRecruitmentPage } = await import('./dynasty/recruitment/recruitment')
+  setupRecruitmentPage()
+  return
+  }
+
   if (path.startsWith('/dynasty')) {
     const { default: initDynasty } = await import('./dynasty/dynastyHome')
     await initDynasty()
