@@ -342,17 +342,47 @@ code {
    Home Page
 ========================= */
 .home-page {
+  position: relative;
   min-height: 100vh;
   padding: 24px;
+
   background:
-    radial-gradient(circle at top, rgba(212, 160, 23, 0.12), transparent 32%),
+    radial-gradient(circle at top, rgba(27, 99, 18, 0.12), transparent 32%),
     linear-gradient(180deg, #101010 0%, #070707 100%);
+
   color: white;
   font-family: system-ui, sans-serif;
 
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.home-page::before {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  z-index: 0;
+
+  background:
+    radial-gradient(circle at 20% 30%, rgba(27, 99, 18, 0.28), transparent 26%),
+    radial-gradient(circle at 80% 20%, rgba(212, 160, 23, 0.16), transparent 24%),
+    radial-gradient(circle at 50% 85%, rgba(255, 255, 255, 0.05), transparent 28%);
+
+  animation: home-bg-drift 16s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.home-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.42));
+
+  pointer-events: none;
 }
 
 .home-card {
