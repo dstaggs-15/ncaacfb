@@ -1,5 +1,5 @@
 import { signIn, signUp } from './auth'
-import loginHtml from './login.html?raw'
+import loginHtml from './login/login.html?raw'
 
 export function setupLoginPage() {
   const app = document.querySelector<HTMLDivElement>('#app')
