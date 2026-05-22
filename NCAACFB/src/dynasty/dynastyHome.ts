@@ -48,8 +48,7 @@ async function showDynasty() {
             Track teams, coaches, records, seasons, rivalries, playoff runs, and every bit of digital football folklore your league creates.
           </p>
           <div class="hero-actions">
-            <a class="primary-button" href="/dynasty/seasons/">View Seasons</a>
-            <a class="secondary-button" href="/dynasty/teams/">View Teams</a>
+            <a class="primary-button" href="/dynasty/seasons/">View Dynasties</a>
           </div>
         </div>
         <aside class="scoreboard-card">
