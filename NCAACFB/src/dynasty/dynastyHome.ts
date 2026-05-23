@@ -152,6 +152,9 @@ async function showDynasty(selectedDynastyId?: string) {
           <div class="hero-actions">
             <a class="primary-button" href="/dynasty/seasons/">View Dynasties</a>
           </div>
+          <div class="hero-actions">
+            <a class="primary-button" href="/dynasty/recruitment/recruitment/">Sell Calculator</a>
+          </div>
         </div>
         <aside class="scoreboard-card">
           <p class="scoreboard-label">Active Dynasty</p>
@@ -197,11 +200,6 @@ async function showDynasty(selectedDynastyId?: string) {
           <span class="card-kicker">Conference Table</span>
           <h2>Standings</h2>
           <p>See who is rising, collapsing, surviving, or becoming bulletin-board material.</p>
-        </a>
-      </section>
-      <section class="dynasty-recruitment-link">
-        <a class="primary-button" href="/recruitment/">
-          Recruitment Setup
         </a>
       </section>
       <section class="activity-panel">
