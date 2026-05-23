@@ -22,7 +22,7 @@ async function init() {
     return
   }
 
-  if (path.startsWith('/dynasty/add')) {
+  if (path.startsWith('/dynasty/addStats')) {
     const { default: initAddStats } = await import('./dynasty/addStats')
     await initAddStats()
     return
