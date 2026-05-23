@@ -881,3 +881,9 @@ code {
     grid-template-columns: 1fr;
   }
 }
+
+.dynasty-recruitment-link {
+  display: flex;
+  justify-content: center;
+  margin: 28px 0;
+}

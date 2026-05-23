@@ -199,6 +199,11 @@ async function showDynasty(selectedDynastyId?: string) {
           <p>See who is rising, collapsing, surviving, or becoming bulletin-board material.</p>
         </a>
       </section>
+      <section class="dynasty-recruitment-link">
+        <a class="primary-button" href="/recruitment/">
+          Recruitment Setup
+        </a>
+      </section>
       <section class="activity-panel">
         <div>
           <p class="eyebrow">Manage Dynasties</p>
