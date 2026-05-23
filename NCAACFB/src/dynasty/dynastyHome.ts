@@ -155,7 +155,20 @@ async function showDynasty(selectedDynastyId?: string) {
         </div>
         <aside class="scoreboard-card">
           <p class="scoreboard-label">Active Dynasty</p>
-          <select id="dynasty-selector" style="width:100%;padding:10px;background:#0f172a;color:white;border:1px solid rgba(148,163,184,0.24);border-radius:8px;font-size:18px;font-weight:bold;margin-bottom:16px;">
+          <select
+            id="dynasty-selector"
+            style="
+              width:100%;
+              padding:10px;
+              background:#0f172a;
+              color:white;
+              border:1px solid rgba(148,163,184,0.24);
+              border-radius:8px;
+              font-size:18px;
+              font-weight:bold;
+              margin-bottom:16px;
+            "
+          >
             ${dynastyOptions}
           </select>
           <div class="score-row">
