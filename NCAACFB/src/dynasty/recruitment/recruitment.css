@@ -261,3 +261,28 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.reset-recruitment-btn {
+  width: 100%;
+  margin-top: 22px;
+  min-height: 44px;
+  border: 1px solid rgba(212, 160, 23, 0.45);
+  border-radius: 14px;
+  background: rgba(212, 160, 23, 0.08);
+  color: #f4f5f6;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.reset-recruitment-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(212, 160, 23, 0.16);
+  border-color: #d4a017;
+  color: #ffffff;
+}

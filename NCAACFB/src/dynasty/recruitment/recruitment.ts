@@ -249,6 +249,7 @@ export function setupRecruitmentPage() {
   renderMotivations()
   renderPitchInputs()
   renderYesCounter()
+  setupResetButton()
 }
 
 function renderMotivations() {
@@ -401,4 +402,22 @@ function motivationIsPossible(motivation: Motivation) {
   }
 
   return true
+}
+
+function setupResetButton() {
+  const resetButton = document.querySelector<HTMLButtonElement>('#reset-recruitment-btn')
+
+  if (!resetButton) {
+    return
+  }
+
+  resetButton.addEventListener('click', () => {
+    for (const key of Object.keys(selectedPitches)) {
+      delete selectedPitches[key]
+    }
+
+    renderMotivations()
+    renderPitchInputs()
+    renderYesCounter()
+  })
 }
