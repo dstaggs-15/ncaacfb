@@ -246,4 +246,4 @@ async function init() {
   showGameForm()
 }
 
-init()
+export default init;
