@@ -151,8 +151,6 @@ async function showDynasty(selectedDynastyId?: string) {
           </p>
           <div class="hero-actions">
             <a class="primary-button" href="/dynasty/seasons/">View Dynasties</a>
-          </div>
-          <div class="hero-actions">
             <a class="primary-button" href="/dynasty/recruitment/recruitment/">Sell Calculator</a>
           </div>
         </div>
