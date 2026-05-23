@@ -20,12 +20,76 @@ async function showDynasty(selectedDynastyId?: string) {
         </nav>
         <div style="text-align:center;padding:80px 20px;color:white;">
           <h2>You have no dynasties yet</h2>
-          <p style="color:#888;margin:16px 0 32px;">Create one to get started</p>
-          <button id="create-btn" style="padding:12px 24px;background:#D4A017;color:black;border:none;border-radius:8px;font-weight:bold;font-size:16px;cursor:pointer;">+ Create Dynasty</button>
-          <div id="create-form" style="display:none;margin-top:32px;max-width:400px;margin-left:auto;margin-right:auto;">
-            <input id="dynasty-name" type="text" placeholder="Dynasty name" style="width:100%;padding:12px;background:#1a1a1a;color:white;border:1px solid #333;border-radius:8px;font-size:16px;margin-bottom:12px;" />
-            <button id="submit-dynasty" style="width:100%;padding:12px;background:#D4A017;color:black;border:none;border-radius:8px;font-weight:bold;font-size:16px;cursor:pointer;">Create</button>
-            <p id="create-msg" style="color:#888;margin-top:8px;"></p>
+          <p 
+            style="color:#888;
+            margin:16px 0 32px;">
+            Create one to get started
+          </p>
+          <button
+            id="create-btn"
+            style="
+              padding:12px 24px;
+              background:#D4A017;
+              color:black;
+              border:none;
+              border-radius:8px;
+              font-weight:bold;
+              font-size:16px;
+              cursor:pointer;
+            "
+          >
+            + Create Dynasty
+          </button>
+          <div
+            id="create-form"
+            style="
+              display:none;
+              margin-top:32px;
+              max-width:400px;
+              margin-left:auto;
+              margin-right:auto;
+            "
+          >
+            <input
+              id="dynasty-name"
+              type="text"
+              placeholder="Dynasty name"
+              style="
+                width:100%;
+                padding:12px;
+                background:#1a1a1a;
+                color:white;
+                border:1px solid #333;
+                border-radius:8px;
+                font-size:16px;
+                margin-bottom:12px;
+              "
+            />
+
+            <button
+              id="submit-dynasty"
+              style="
+                width:100%;
+                padding:12px;
+                background:#D4A017;
+                color:black;
+                border:none;
+                border-radius:8px;
+                font-weight:bold;
+                font-size:16px;
+                cursor:pointer;
+              "
+            >
+              Create
+            </button>
+
+            <p
+              id="create-msg"
+              style="
+                color:#888;
+                margin-top:8px;
+              "
+            ></p>
           </div>
         </div>
       </main>
@@ -128,19 +192,137 @@ async function showDynasty(selectedDynastyId?: string) {
           <p class="eyebrow">Manage Dynasties</p>
           <h2>Create or invite</h2>
           <p>Start a new dynasty or invite someone to yours.</p>
-          <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;">
-            <button id="show-create" style="padding:10px 20px;background:#D4A017;color:black;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">+ Create Dynasty</button>
-            <button id="show-invite" style="padding:10px 20px;background:#222;color:white;border:1px solid #444;border-radius:8px;cursor:pointer;">Invite Member</button>
+
+          <div
+            style="
+              display:flex;
+              gap:12px;
+              margin-top:20px;
+              flex-wrap:wrap;
+            "
+          >
+            <button
+              id="show-create"
+              style="
+                padding:10px 20px;
+                background:#D4A017;
+                color:black;
+                border:none;
+                border-radius:8px;
+                font-weight:bold;
+                cursor:pointer;
+              "
+            >
+              + Create Dynasty
+            </button>
+
+            <button
+              id="show-invite"
+              style="
+                padding:10px 20px;
+                background:#222;
+                color:white;
+                border:1px solid #444;
+                border-radius:8px;
+                cursor:pointer;
+              "
+            >
+              Invite Member
+            </button>
           </div>
-          <div id="create-form" style="display:none;margin-top:20px;">
-            <input id="new-dynasty-name" type="text" placeholder="Dynasty name" style="width:100%;padding:12px;background:#0f172a;color:white;border:1px solid #333;border-radius:8px;font-size:16px;margin-bottom:8px;" />
-            <button id="submit-create" style="padding:10px 20px;background:#D4A017;color:black;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">Create</button>
-            <p id="create-msg" style="color:#D4A017;margin-top:8px;"></p>
+
+          <div
+            id="create-form"
+            style="
+              display:none;
+              margin-top:20px;
+            "
+          >
+            <input
+              id="new-dynasty-name"
+              type="text"
+              placeholder="Dynasty name"
+              style="
+                width:100%;
+                padding:12px;
+                background:#0f172a;
+                color:white;
+                border:1px solid #333;
+                border-radius:8px;
+                font-size:16px;
+                margin-bottom:8px;
+              "
+            />
+
+            <button
+              id="submit-create"
+              style="
+                padding:10px 20px;
+                background:#D4A017;
+                color:black;
+                border:none;
+                border-radius:8px;
+                font-weight:bold;
+                cursor:pointer;
+              "
+            >
+              Create
+            </button>
+
+            <p
+              id="create-msg"
+              style="
+                color:#D4A017;
+                margin-top:8px;
+              "
+            ></p>
           </div>
-          <div id="invite-form" style="display:none;margin-top:20px;">
-            <input id="invite-email" type="email" placeholder="User email" style="width:100%;padding:12px;background:#0f172a;color:white;border:1px solid #333;border-radius:8px;font-size:16px;margin-bottom:8px;" />
-            <button id="submit-invite" style="padding:10px 20px;background:#D4A017;color:black;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">Invite</button>
-            <p id="invite-msg" style="color:#D4A017;margin-top:8px;"></p>
+
+          <div
+            id="invite-form"
+            style="
+              display:none;
+              margin-top:20px;
+            "
+          >
+            <input
+              id="invite-email"
+              type="email"
+              placeholder="User email"
+              style="
+                width:100%;
+                padding:12px;
+                background:#0f172a;
+                color:white;
+                border:1px solid #333;
+                border-radius:8px;
+                font-size:16px;
+                margin-bottom:8px;
+              "
+            />
+
+            <button
+              id="submit-invite"
+              style="
+                padding:10px 20px;
+                background:#D4A017;
+                color:black;
+                border:none;
+                border-radius:8px;
+                font-weight:bold;
+                cursor:pointer;
+              "
+            >
+              Invite
+            </button>
+
+            <p
+              id="invite-msg"
+              style="
+                color:#D4A017;
+                margin-top:8px;
+              "
+            ></p>
           </div>
         </div>
         <div class="activity-list">
@@ -211,14 +393,101 @@ async function showDynasty(selectedDynastyId?: string) {
 async function showLogin() {
   const app = document.querySelector<HTMLDivElement>('#app')!
   app.innerHTML = `
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#0a0a0a;color:white;font-family:system-ui;padding:20px;">
-      <h1 style="margin-bottom:8px;">CFB Dynasty</h1>
-      <p style="color:#888;margin-bottom:32px;">Sign in to continue</p>
-      <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:360px;background:#1a1a1a;padding:32px;border-radius:12px;">
-        <input id="email" type="email" placeholder="Email" style="padding:12px;background:#111;color:white;border:1px solid #333;border-radius:8px;font-size:16px;" />
-        <input id="password" type="password" placeholder="Password" style="padding:12px;background:#111;color:white;border:1px solid #333;border-radius:8px;font-size:16px;" />
-        <button id="login-btn" style="padding:12px;background:#D4A017;color:black;border:none;border-radius:8px;font-weight:bold;font-size:16px;cursor:pointer;">Log In</button>
-        <p id="msg" style="color:#888;text-align:center;font-size:14px;margin:0;"></p>
+    <div
+      style="
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        min-height:100vh;
+        background:#0a0a0a;
+        color:white;
+        font-family:system-ui;
+        padding:20px;
+      "
+    >
+      <h1
+        style="
+          margin-bottom:8px;
+        "
+      >
+        CFB Dynasty
+      </h1>
+
+      <p
+        style="
+          color:#888;
+          margin-bottom:32px;
+        "
+      >
+        Sign in to continue
+      </p>
+
+      <div
+        style="
+          display:flex;
+          flex-direction:column;
+          gap:12px;
+          width:100%;
+          max-width:360px;
+          background:#1a1a1a;
+          padding:32px;
+          border-radius:12px;
+        "
+      >
+        <input
+          id="email"
+          type="email"
+          placeholder="Email"
+          style="
+            padding:12px;
+            background:#111;
+            color:white;
+            border:1px solid #333;
+            border-radius:8px;
+            font-size:16px;
+          "
+        />
+
+        <input
+          id="password"
+          type="password"
+          placeholder="Password"
+          style="
+            padding:12px;
+            background:#111;
+            color:white;
+            border:1px solid #333;
+            border-radius:8px;
+            font-size:16px;
+          "
+        />
+
+        <button
+          id="login-btn"
+          style="
+            padding:12px;
+            background:#D4A017;
+            color:black;
+            border:none;
+            border-radius:8px;
+            font-weight:bold;
+            font-size:16px;
+            cursor:pointer;
+          "
+        >
+          Log In
+        </button>
+
+        <p
+          id="msg"
+          style="
+            color:#888;
+            text-align:center;
+            font-size:14px;
+            margin:0;
+          "
+        ></p>
       </div>
     </div>
   `
