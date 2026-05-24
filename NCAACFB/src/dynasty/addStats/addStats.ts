@@ -76,73 +76,70 @@ export default async function initAddStatsPage() {
     const seasonOptions = await getSeasonOptions(firstDynastyId)
 
     formArea.innerHTML = `
-      <form id="game-form" class="add-stats-form">
-        <label>
-          Dynasty
-          <select id="game-dynasty-id" required>
-            ${dynastyOptions}
-          </select>
-        </label>
+        <form id="game-form" class="add-stats-form">
+            <label>
+            Dynasty
+            <select id="game-dynasty-id" required>
+                ${dynastyOptions}
+            </select>
+            </label>
 
-        <label>
-          Season
-          <select id="game-season-id" required>
-            ${seasonOptions}
-          </select>
-        </label>
+            <label>
+            Season
+            <select id="game-season-id" required>
+                ${seasonOptions}
+            </select>
+            </label>
 
-        <div class="form-grid">
-          <label>
-            Home Team
-            <input id="home-team" type="text" placeholder="USC" required />
-          </label>
+            <div class="form-grid">
+            <label>
+                Home Team
+                <input id="home-team" type="text" placeholder="USC" required />
+            </label>
 
-          <label>
-            Away Team
-            <input id="away-team" type="text" placeholder="Alabama" required />
-          </label>
-        </div>
+            <label>
+                Away Team
+                <input id="away-team" type="text" placeholder="Alabama" required />
+            </label>
+            </div>
 
-        <div class="form-grid">
-          <label>
-            Home Score
-            <input id="home-score" type="number" placeholder="35" />
-          </label>
+            <div class="form-grid">
+            <label>
+                Home Score
+                <input id="home-score" type="number" placeholder="35" />
+            </label>
 
-          <label>
-            Away Score
-            <input id="away-score" type="number" placeholder="31" />
-          </label>
-        </div>
+            <label>
+                Away Score
+                <input id="away-score" type="number" placeholder="31" />
+            </label>
+            </div>
 
-        <label>
-          Week
-          <input id="week" type="number" placeholder="1" />
-        </label>
+            <label>
+            Week
+            <input id="week" type="number" placeholder="1" />
+            </label>
 
-        <label class="form-check">
-          <input id="is-rivalry" type="checkbox" />
-          Rivalry Game
-        </label>
+            <label>
+            Game Type
+            <select id="game-type">
+                <option value="regular_season">Regular Season</option>
+                <option value="rivalry">Rivalry Game</option>
+                <option value="conference_championship">Conference Championship</option>
+                <option value="playoff">Playoff Game</option>
+                <option value="bowl">Bowl Game</option>
+                <option value="national_championship">National Championship</option>
+            </select>
+            </label>
 
-        <label class="form-check">
-          <input id="is-playoff" type="checkbox" />
-          Playoff Game
-        </label>
+            <label>
+            Notes
+            <textarea id="game-notes" rows="4" placeholder="Optional game notes..."></textarea>
+            </label>
 
-        <label class="form-check">
-          <input id="is-conference-championship" type="checkbox" />
-          Conference Championship
-        </label>
-
-        <label>
-          Notes
-          <textarea id="game-notes" rows="4" placeholder="Optional game notes..."></textarea>
-        </label>
-
-        <button class="submit-button" type="submit">Submit Game</button>
-      </form>
-    `
+            <button class="submit-button" type="submit">Submit Game</button>
+        </form>
+        `
 
     document.querySelector<HTMLSelectElement>('#game-dynasty-id')?.addEventListener('change', async (event) => {
       const dynastyId = (event.target as HTMLSelectElement).value
@@ -154,46 +151,50 @@ export default async function initAddStatsPage() {
     })
 
     document.querySelector<HTMLFormElement>('#game-form')?.addEventListener('submit', async (event) => {
-      event.preventDefault()
+        event.preventDefault()
 
-      const dynastyId = getSelectValue('#game-dynasty-id')
-      const seasonId = getSelectValue('#game-season-id')
-      const homeTeam = getInputValue('#home-team')
-      const awayTeam = getInputValue('#away-team')
-      const homeScore = getNumberValue('#home-score')
-      const awayScore = getNumberValue('#away-score')
-      const week = getNumberValue('#week')
-      const isRivalry = getCheckedValue('#is-rivalry')
-      const isPlayoff = getCheckedValue('#is-playoff')
-      const isConferenceChampionship = getCheckedValue('#is-conference-championship')
-      const notes = getTextAreaValue('#game-notes')
+        const dynastyId = getSelectValue('#game-dynasty-id')
+        const seasonId = getSelectValue('#game-season-id')
+        const homeTeam = getInputValue('#home-team')
+        const awayTeam = getInputValue('#away-team')
+        const homeScore = getNumberValue('#home-score')
+        const awayScore = getNumberValue('#away-score')
+        const week = getNumberValue('#week')
+        const gameType = getSelectValue('#game-type')
+        const isRivalry = gameType === 'rivalry'
+        const isPlayoff =
+        gameType === 'playoff' ||
+        gameType === 'bowl' ||
+        gameType === 'national_championship'
+        const isConferenceChampionship = gameType === 'conference_championship'
+        const notes = getTextAreaValue('#game-notes')
 
-      if (!dynastyId || !seasonId || !homeTeam || !awayTeam) {
-        setStatus('Please choose a dynasty, choose a season, and enter both teams.', 'error')
-        return
-      }
+        if (!dynastyId || !seasonId || !homeTeam || !awayTeam) {
+            setStatus('Please choose a dynasty, choose a season, and enter both teams.', 'error')
+            return
+        }
 
-      const { error } = await supabase.from('games').insert({
-        dynasty_id: dynastyId,
-        season_id: seasonId,
-        home_team: homeTeam,
-        away_team: awayTeam,
-        home_score: homeScore,
-        away_score: awayScore,
-        week,
-        is_rivalry: isRivalry,
-        is_playoff: isPlayoff,
-        is_conference_championship: isConferenceChampionship,
-        notes: notes || null
-      })
+        const { error } = await supabase.from('games').insert({
+            dynasty_id: dynastyId,
+            season_id: seasonId,
+            home_team: homeTeam,
+            away_team: awayTeam,
+            home_score: homeScore,
+            away_score: awayScore,
+            week,
+            is_rivalry: isRivalry,
+            is_playoff: isPlayoff,
+            is_conference_championship: isConferenceChampionship,
+            notes: notes || null
+        })
 
-      if (error) {
-        setStatus(error.message, 'error')
-        return
-      }
+        if (error) {
+            setStatus(error.message, 'error')
+            return
+        }
 
-      setStatus('Game submitted.', 'success')
-      await renderGameForm()
+        setStatus('Game submitted.', 'success')
+        await renderGameForm()
     })
   }
 
