@@ -22,12 +22,6 @@ async function init() {
     return
   }
 
-  if (path.startsWith('/dynasty/addStats')) {
-    const { default: initAddStats } = await import('./dynasty/addStats')
-    await initAddStats()
-    return
-  }
-
   if (path.startsWith('/dynasty/seasons')) {
     const { default: initSeasons } = await import('./dynasty/seasons')
     await initSeasons()
@@ -43,6 +37,12 @@ async function init() {
   if (path.startsWith('/dynasty/standings')) {
     const { default: initStandings } = await import('./dynasty/standings')
     await initStandings()
+    return
+  }
+
+  if (path.startsWith('/dynasty/addStats')) {
+    const { default: initAddStats } = await import('./dynasty/addStats/addStats')
+    await initAddStats()
     return
   }
 

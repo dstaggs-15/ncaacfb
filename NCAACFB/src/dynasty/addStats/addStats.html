@@ -1,0 +1,43 @@
+<main class="add-stats-page">
+  <section class="add-stats-shell">
+    <header class="add-stats-header">
+      <nav class="add-stats-nav">
+        <a href="/dynasty/" class="back-link">← Back to Dynasty</a>
+      </nav>
+
+      <p class="add-stats-kicker">Dynasty Control Room</p>
+      <h1>Add Stats</h1>
+      <p class="add-stats-subtitle">
+        Add seasons, game results, team records, trophies, and other dynasty history.
+      </p>
+    </header>
+
+    <section class="add-stats-card">
+      <div class="add-stats-tabs" aria-label="Add stats sections">
+        <button class="add-stats-tab active" id="game-tab" type="button" data-tab="game">
+          Game Result
+        </button>
+
+        <button class="add-stats-tab" id="season-tab" type="button" data-tab="season">
+          Season
+        </button>
+
+        <button class="add-stats-tab" id="team-tab" type="button" data-tab="team">
+          Team
+        </button>
+
+        <button class="add-stats-tab" id="trophy-tab" type="button" data-tab="trophy">
+          Trophy
+        </button>
+      </div>
+
+      <div class="add-stats-content">
+        <div id="form-area" class="form-area">
+          <!-- TypeScript injects the selected form here -->
+        </div>
+
+        <p id="status-message" class="status-message" aria-live="polite"></p>
+      </div>
+    </section>
+  </section>
+</main>
