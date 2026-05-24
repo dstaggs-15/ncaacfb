@@ -41,8 +41,8 @@ async function init() {
   }
 
   if (path.startsWith('/dynasty/addStats')) {
-    const { default: initAddStats } = await import('./dynasty/addStats/addStats')
-    await initAddStats()
+    const { default: initAddStatsPage } = await import('./dynasty/addStats/addStats')
+    await initAddStatsPage()
     return
   }
 
