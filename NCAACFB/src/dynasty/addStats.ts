@@ -4,7 +4,7 @@ import { getAllDynasties } from "./dynastyData";
 
 async function init() {
   const dynasties = await getAllDynasties();
-  const app = document.querySelector<HTMLDivElement>("#add-app")!;
+  const app = document.querySelector<HTMLDivElement>("#add")!;
 
   const dynastyOptions = dynasties.map((d: any) =>
     `<option value="${d.id}">${d.name}</option>`
