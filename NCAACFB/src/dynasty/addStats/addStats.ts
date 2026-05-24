@@ -236,31 +236,31 @@ export default async function initAddStatsPage() {
             return
         }
 
-    if (isCurrent) {
-        const { error: updateError } = await supabase
+        if (isCurrent) {
+            const { error: updateError } = await supabase
             .from('seasons')
             .update({ is_current: false })
             .eq('dynasty_id', dynastyId)
 
-        if (updateError) {
-            setStatus(updateError.message, 'error')
+            if (updateError) {
+                setStatus(updateError.message, 'error')
+                return
+            }
+        }
+
+        const { error } = await supabase.from('seasons').insert({
+            dynasty_id: dynastyId,
+            year,
+            is_current: isCurrent
+        })
+
+        if (error) {
+            setStatus(error.message, 'error')
             return
         }
-    }
 
-    const { error } = await supabase.from('seasons').insert({
-        dynasty_id: dynastyId,
-        year,
-        is_current: isCurrent
-    })
-
-      if (error) {
-        setStatus(error.message, 'error')
-        return
-      }
-
-      setStatus('Season created.', 'success')
-      renderSeasonForm()
+        setStatus('Season created.', 'success')
+        renderSeasonForm()
     })
   }
 
