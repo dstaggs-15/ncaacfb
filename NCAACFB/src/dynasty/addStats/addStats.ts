@@ -215,9 +215,9 @@ export default async function initAddStatsPage() {
           <input id="season-year" type="number" placeholder="2026" required />
         </label>
 
-        <label class="form-check">
-          <input id="is-current" type="checkbox" />
-          Current Season
+        <label class="form-check form-check-row">
+            <span>Current Season</span>
+            <input id="is-current" type="checkbox" />
         </label>
 
         <button class="submit-button" type="submit">Submit Season</button>
