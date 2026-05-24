@@ -15,7 +15,7 @@ export default async function initAddStatsPage() {
   const app = document.querySelector<HTMLDivElement>('#app')
 
   if (!app) {
-    console.error('Could not find #app container')
+    console.error('Could not find #app container.')
     return
   }
 
@@ -25,7 +25,7 @@ export default async function initAddStatsPage() {
   const statusMessage = document.querySelector<HTMLParagraphElement>('#status-message')
 
   if (!formArea || !statusMessage) {
-    console.error('Add Stats page is missing #form-area or #status-message')
+    console.error('Add Stats page is missing #form-area or #status-message.')
     return
   }
 
@@ -45,8 +45,35 @@ export default async function initAddStatsPage() {
     setStatus('')
   }
 
-  function renderGameForm() {
+  async function getSeasonOptions(dynastyId: string) {
+    if (!dynastyId) {
+      return '<option value="">No dynasty selected</option>'
+    }
+
+    const { data, error } = await supabase
+      .from('seasons')
+      .select('id, year')
+      .eq('dynasty_id', dynastyId)
+      .order('year', { ascending: false })
+
+    if (error) {
+      return `<option value="">${error.message}</option>`
+    }
+
+    if (!data || data.length === 0) {
+      return '<option value="">No seasons yet</option>'
+    }
+
+    return data
+      .map((season) => `<option value="${season.id}">${season.year} Season</option>`)
+      .join('')
+  }
+
+  async function renderGameForm() {
     setActiveTab('game')
+
+    const firstDynastyId = dynasties[0]?.id ?? ''
+    const seasonOptions = await getSeasonOptions(firstDynastyId)
 
     formArea.innerHTML = `
       <form id="game-form" class="add-stats-form">
@@ -58,13 +85,10 @@ export default async function initAddStatsPage() {
         </label>
 
         <label>
-          Season Year
-          <input id="game-season-year" type="number" placeholder="2026" required />
-        </label>
-
-        <label>
-          Week
-          <input id="game-week" type="number" placeholder="1" />
+          Season
+          <select id="game-season-id" required>
+            ${seasonOptions}
+          </select>
         </label>
 
         <div class="form-grid">
@@ -82,63 +106,85 @@ export default async function initAddStatsPage() {
         <div class="form-grid">
           <label>
             Home Score
-            <input id="home-score" type="number" placeholder="35" required />
+            <input id="home-score" type="number" placeholder="35" />
           </label>
 
           <label>
             Away Score
-            <input id="away-score" type="number" placeholder="31" required />
+            <input id="away-score" type="number" placeholder="31" />
           </label>
         </div>
 
         <label>
-          Game Type
-          <select id="game-type">
-            <option value="regular">Regular Season</option>
-            <option value="conference_championship">Conference Championship</option>
-            <option value="playoff">Playoff</option>
-            <option value="bowl">Bowl Game</option>
-            <option value="national_championship">National Championship</option>
-          </select>
+          Week
+          <input id="week" type="number" placeholder="1" />
+        </label>
+
+        <label class="form-check">
+          <input id="is-rivalry" type="checkbox" />
+          Rivalry Game
+        </label>
+
+        <label class="form-check">
+          <input id="is-playoff" type="checkbox" />
+          Playoff Game
+        </label>
+
+        <label class="form-check">
+          <input id="is-conference-championship" type="checkbox" />
+          Conference Championship
         </label>
 
         <label>
           Notes
-          <textarea id="game-notes" rows="4" placeholder="Big comeback, upset win, rivalry chaos..."></textarea>
+          <textarea id="game-notes" rows="4" placeholder="Optional game notes..."></textarea>
         </label>
 
-        <button class="submit-button" type="submit">Save Game Result</button>
+        <button class="submit-button" type="submit">Submit Game</button>
       </form>
     `
+
+    document.querySelector<HTMLSelectElement>('#game-dynasty-id')?.addEventListener('change', async (event) => {
+      const dynastyId = (event.target as HTMLSelectElement).value
+      const seasonSelect = document.querySelector<HTMLSelectElement>('#game-season-id')
+
+      if (seasonSelect) {
+        seasonSelect.innerHTML = await getSeasonOptions(dynastyId)
+      }
+    })
 
     document.querySelector<HTMLFormElement>('#game-form')?.addEventListener('submit', async (event) => {
       event.preventDefault()
 
       const dynastyId = getSelectValue('#game-dynasty-id')
-      const seasonYear = getNumberValue('#game-season-year')
-      const week = getNumberValue('#game-week')
+      const seasonId = getSelectValue('#game-season-id')
       const homeTeam = getInputValue('#home-team')
       const awayTeam = getInputValue('#away-team')
       const homeScore = getNumberValue('#home-score')
       const awayScore = getNumberValue('#away-score')
-      const gameType = getSelectValue('#game-type')
+      const week = getNumberValue('#week')
+      const isRivalry = getCheckedValue('#is-rivalry')
+      const isPlayoff = getCheckedValue('#is-playoff')
+      const isConferenceChampionship = getCheckedValue('#is-conference-championship')
       const notes = getTextAreaValue('#game-notes')
 
-      if (!dynastyId || !seasonYear || !homeTeam || !awayTeam || homeScore === null || awayScore === null) {
-        setStatus('Please fill out all required game fields.', 'error')
+      if (!dynastyId || !seasonId || !homeTeam || !awayTeam) {
+        setStatus('Please choose a dynasty, choose a season, and enter both teams.', 'error')
         return
       }
 
       const { error } = await supabase.from('games').insert({
         dynasty_id: dynastyId,
-        season_year: seasonYear,
-        week,
+        season_id: seasonId,
         home_team: homeTeam,
         away_team: awayTeam,
         home_score: homeScore,
         away_score: awayScore,
-        game_type: gameType,
-        notes
+        week,
+        is_rivalry: isRivalry,
+        is_playoff: isPlayoff,
+        is_conference_championship: isConferenceChampionship,
+        notes: notes || null
       })
 
       if (error) {
@@ -146,8 +192,8 @@ export default async function initAddStatsPage() {
         return
       }
 
-      setStatus('Game result saved.', 'success')
-      renderGameForm()
+      setStatus('Game submitted.', 'success')
+      await renderGameForm()
     })
   }
 
@@ -164,41 +210,16 @@ export default async function initAddStatsPage() {
         </label>
 
         <label>
-          Season Year
+          Year
           <input id="season-year" type="number" placeholder="2026" required />
         </label>
 
-        <div class="form-grid">
-          <label>
-            Wins
-            <input id="season-wins" type="number" placeholder="12" />
-          </label>
-
-          <label>
-            Losses
-            <input id="season-losses" type="number" placeholder="1" />
-          </label>
-        </div>
-
-        <label>
-          Result
-          <select id="season-result">
-            <option value="">Select result</option>
-            <option value="in_progress">In Progress</option>
-            <option value="regular_season">Regular Season Finished</option>
-            <option value="conference_champion">Conference Champion</option>
-            <option value="playoff_appearance">Playoff Appearance</option>
-            <option value="national_runner_up">National Runner-Up</option>
-            <option value="national_champion">National Champion</option>
-          </select>
+        <label class="form-check">
+          <input id="is-current" type="checkbox" />
+          Current Season
         </label>
 
-        <label>
-          Notes
-          <textarea id="season-notes" rows="4" placeholder="Season summary, playoff run, coach notes..."></textarea>
-        </label>
-
-        <button class="submit-button" type="submit">Save Season</button>
+        <button class="submit-button" type="submit">Submit Season</button>
       </form>
     `
 
@@ -207,23 +228,17 @@ export default async function initAddStatsPage() {
 
       const dynastyId = getSelectValue('#season-dynasty-id')
       const year = getNumberValue('#season-year')
-      const wins = getNumberValue('#season-wins')
-      const losses = getNumberValue('#season-losses')
-      const result = getSelectValue('#season-result')
-      const notes = getTextAreaValue('#season-notes')
+      const isCurrent = getCheckedValue('#is-current')
 
-      if (!dynastyId || !year) {
-        setStatus('Please choose a dynasty and enter a season year.', 'error')
+      if (!dynastyId || year === null) {
+        setStatus('Please choose a dynasty and enter a year.', 'error')
         return
       }
 
       const { error } = await supabase.from('seasons').insert({
         dynasty_id: dynastyId,
         year,
-        wins,
-        losses,
-        result,
-        notes
+        is_current: isCurrent
       })
 
       if (error) {
@@ -231,7 +246,7 @@ export default async function initAddStatsPage() {
         return
       }
 
-      setStatus('Season saved.', 'success')
+      setStatus('Season created.', 'success')
       renderSeasonForm()
     })
   }
@@ -258,24 +273,12 @@ export default async function initAddStatsPage() {
           <input id="team-conference" type="text" placeholder="Big Ten" />
         </label>
 
-        <div class="form-grid">
-          <label>
-            Wins
-            <input id="team-wins" type="number" placeholder="12" />
-          </label>
-
-          <label>
-            Losses
-            <input id="team-losses" type="number" placeholder="1" />
-          </label>
-        </div>
-
         <label>
           Logo URL
           <input id="team-logo-url" type="url" placeholder="https://example.com/logo.png" />
         </label>
 
-        <button class="submit-button" type="submit">Save Team</button>
+        <button class="submit-button" type="submit">Submit Team</button>
       </form>
     `
 
@@ -285,8 +288,6 @@ export default async function initAddStatsPage() {
       const dynastyId = getSelectValue('#team-dynasty-id')
       const name = getInputValue('#team-name')
       const conference = getInputValue('#team-conference')
-      const wins = getNumberValue('#team-wins')
-      const losses = getNumberValue('#team-losses')
       const logoUrl = getInputValue('#team-logo-url')
 
       if (!dynastyId || !name) {
@@ -297,10 +298,8 @@ export default async function initAddStatsPage() {
       const { error } = await supabase.from('teams').insert({
         dynasty_id: dynastyId,
         name,
-        conference,
-        wins,
-        losses,
-        logo_url: logoUrl
+        conference: conference || null,
+        logo_url: logoUrl || null
       })
 
       if (error) {
@@ -308,13 +307,16 @@ export default async function initAddStatsPage() {
         return
       }
 
-      setStatus('Team saved.', 'success')
+      setStatus('Team added.', 'success')
       renderTeamForm()
     })
   }
 
-  function renderTrophyForm() {
+  async function renderTrophyForm() {
     setActiveTab('trophy')
+
+    const firstDynastyId = dynasties[0]?.id ?? ''
+    const seasonOptions = await getSeasonOptions(firstDynastyId)
 
     formArea.innerHTML = `
       <form id="trophy-form" class="add-stats-form">
@@ -326,8 +328,10 @@ export default async function initAddStatsPage() {
         </label>
 
         <label>
-          Trophy Name
-          <input id="trophy-name" type="text" placeholder="National Championship" required />
+          Season
+          <select id="trophy-season-id" required>
+            ${seasonOptions}
+          </select>
         </label>
 
         <label>
@@ -336,52 +340,55 @@ export default async function initAddStatsPage() {
         </label>
 
         <label>
-          Season Year
-          <input id="trophy-season-year" type="number" placeholder="2026" />
-        </label>
-
-        <label>
           Trophy Type
-          <select id="trophy-type">
+          <select id="trophy-type" required>
             <option value="national_championship">National Championship</option>
             <option value="conference_championship">Conference Championship</option>
-            <option value="bowl">Bowl</option>
-            <option value="rivalry">Rivalry</option>
+            <option value="bowl">Bowl Trophy</option>
+            <option value="playoff">Playoff</option>
+            <option value="rivalry">Rivalry Trophy</option>
             <option value="award">Award</option>
           </select>
         </label>
 
         <label>
-          Notes
-          <textarea id="trophy-notes" rows="4" placeholder="Who they beat, score, storylines..."></textarea>
+          Trophy Name
+          <input id="trophy-name" type="text" placeholder="National Championship" />
         </label>
 
-        <button class="submit-button" type="submit">Save Trophy</button>
+        <button class="submit-button" type="submit">Submit Trophy</button>
       </form>
     `
+
+    document.querySelector<HTMLSelectElement>('#trophy-dynasty-id')?.addEventListener('change', async (event) => {
+      const dynastyId = (event.target as HTMLSelectElement).value
+      const seasonSelect = document.querySelector<HTMLSelectElement>('#trophy-season-id')
+
+      if (seasonSelect) {
+        seasonSelect.innerHTML = await getSeasonOptions(dynastyId)
+      }
+    })
 
     document.querySelector<HTMLFormElement>('#trophy-form')?.addEventListener('submit', async (event) => {
       event.preventDefault()
 
       const dynastyId = getSelectValue('#trophy-dynasty-id')
-      const name = getInputValue('#trophy-name')
+      const seasonId = getSelectValue('#trophy-season-id')
       const team = getInputValue('#trophy-team')
-      const seasonYear = getNumberValue('#trophy-season-year')
       const trophyType = getSelectValue('#trophy-type')
-      const notes = getTextAreaValue('#trophy-notes')
+      const trophyName = getInputValue('#trophy-name')
 
-      if (!dynastyId || !name || !team) {
-        setStatus('Please choose a dynasty, enter a trophy name, and enter the winning team.', 'error')
+      if (!dynastyId || !seasonId || !team || !trophyType) {
+        setStatus('Please choose a dynasty, choose a season, enter a winning team, and choose a trophy type.', 'error')
         return
       }
 
       const { error } = await supabase.from('trophies').insert({
         dynasty_id: dynastyId,
-        name,
+        season_id: seasonId,
         team,
-        season_year: seasonYear,
         trophy_type: trophyType,
-        notes
+        trophy_name: trophyName || null
       })
 
       if (error) {
@@ -389,23 +396,23 @@ export default async function initAddStatsPage() {
         return
       }
 
-      setStatus('Trophy saved.', 'success')
-      renderTrophyForm()
+      setStatus('Trophy awarded.', 'success')
+      await renderTrophyForm()
     })
   }
 
   document.querySelectorAll<HTMLButtonElement>('.add-stats-tab').forEach((button) => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', async () => {
       const tab = button.dataset.tab as AddStatsTab
 
-      if (tab === 'game') renderGameForm()
+      if (tab === 'game') await renderGameForm()
       if (tab === 'season') renderSeasonForm()
       if (tab === 'team') renderTeamForm()
-      if (tab === 'trophy') renderTrophyForm()
+      if (tab === 'trophy') await renderTrophyForm()
     })
   })
 
-  renderGameForm()
+  await renderGameForm()
 }
 
 function buildDynastyOptions(dynasties: Dynasty[]) {
@@ -438,4 +445,8 @@ function getNumberValue(selector: string) {
   }
 
   return Number(value)
+}
+
+function getCheckedValue(selector: string) {
+  return document.querySelector<HTMLInputElement>(selector)?.checked ?? false
 }
