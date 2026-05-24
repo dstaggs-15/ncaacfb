@@ -225,22 +225,34 @@ export default async function initAddStatsPage() {
     `
 
     document.querySelector<HTMLFormElement>('#season-form')?.addEventListener('submit', async (event) => {
-      event.preventDefault()
+        event.preventDefault()
 
-      const dynastyId = getSelectValue('#season-dynasty-id')
-      const year = getNumberValue('#season-year')
-      const isCurrent = getCheckedValue('#is-current')
+        const dynastyId = getSelectValue('#season-dynasty-id')
+        const year = getNumberValue('#season-year')
+        const isCurrent = getCheckedValue('#is-current')
 
-      if (!dynastyId || year === null) {
-        setStatus('Please choose a dynasty and enter a year.', 'error')
-        return
-      }
+        if (!dynastyId || year === null) {
+            setStatus('Please choose a dynasty and enter a year.', 'error')
+            return
+        }
 
-      const { error } = await supabase.from('seasons').insert({
+    if (isCurrent) {
+        const { error: updateError } = await supabase
+            .from('seasons')
+            .update({ is_current: false })
+            .eq('dynasty_id', dynastyId)
+
+        if (updateError) {
+            setStatus(updateError.message, 'error')
+            return
+        }
+    }
+
+    const { error } = await supabase.from('seasons').insert({
         dynasty_id: dynastyId,
         year,
         is_current: isCurrent
-      })
+    })
 
       if (error) {
         setStatus(error.message, 'error')
