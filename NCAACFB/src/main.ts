@@ -22,11 +22,11 @@ async function init() {
     return
   }
 
-  if (path.startsWith('/dynasty/seasons')) {
-    const { default: initSeasons } = await import('./dynasty/seasons')
-    await initSeasons()
-    return
-  }
+if (path.startsWith("/dynasty/seasons")) {
+    const { default: setupSeasonsPage } = await import("./dynasty/seasons/seasons");
+    setupSeasonsPage();
+    return;
+}
 
   if (path.startsWith('/dynasty/standings')) {
     const { default: initStandings } = await import('./dynasty/standings')
