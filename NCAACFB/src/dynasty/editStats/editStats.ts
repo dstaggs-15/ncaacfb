@@ -130,7 +130,7 @@ export default async function initEditStatsPage() {
                 const score = formatScore(game)
                 const seasonYear = game.seasons?.[0]?.year
                 const year = seasonYear ? `${seasonYear} Season` : 'Unknown season'
-                const week = game.week === null ? 'Week not set' : `Week ${game.week}`
+                const week = formatGameWeek(game.week)
 
                 return `
                     <button class="record-button" type="button" data-game-id="${game.id}">
@@ -216,7 +216,9 @@ export default async function initEditStatsPage() {
 
                 <label>
                     Week
-                    <input id="week" type="number" value="${game.week ?? ''}" />
+                    <select id="week">
+                        ${buildWeekOptions(game.week)}
+                    </select>
                 </label>
 
                 <label>
@@ -260,7 +262,7 @@ export default async function initEditStatsPage() {
         const awayTeam = getInputValue('#away-team')
         const homeScore = getNumberValue('#home-score')
         const awayScore = getNumberValue('#away-score')
-        const week = getNumberValue('#week')
+        const week = getWeekValue('#week')
         const gameType = getSelectValue('#game-type')
         const notes = getTextAreaValue('#game-notes')
 
@@ -378,12 +380,35 @@ function buildDynastyOptions(dynasties: Dynasty[]) {
     `
 }
 
+function buildWeekOptions(selectedWeek: number | null | undefined) {
+    const weekOptions = Array.from({ length: 16 }, (_, index) => {
+        const selected = selectedWeek === index ? 'selected' : ''
+
+        return `<option value="${index}" ${selected}>Week ${index}</option>`
+    }).join('')
+
+    const postSeasonSelected = selectedWeek === null || selectedWeek === undefined ? 'selected' : ''
+
+    return `
+        ${weekOptions}
+        <option value="" ${postSeasonSelected}>Post-Season</option>
+    `
+}
+
 function formatScore(game: GameRecord) {
     if (game.home_score === null || game.away_score === null) {
         return ''
     }
 
     return ` • ${game.away_score}-${game.home_score}`
+}
+
+function formatGameWeek(week: number | null | undefined) {
+    if (week === null || week === undefined) {
+        return 'Post-Season'
+    }
+
+    return `Week ${week}`
 }
 
 function getGameType(game: GameRecord) {
@@ -402,6 +427,16 @@ function getRequiredElement<T extends HTMLElement>(selector: string) {
     }
 
     return element
+}
+
+function getWeekValue(selector: string) {
+    const value = document.querySelector<HTMLSelectElement>(selector)?.value
+
+    if (value === undefined || value === '') {
+        return null
+    }
+
+    return Number(value)
 }
 
 function getInputValue(selector: string) {
