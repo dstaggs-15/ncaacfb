@@ -28,11 +28,11 @@ async function init() {
     return
   }
 
-  if (path.startsWith('/dynasty/coaches')) {
-    const { default: initCoaches } = await import('./dynasty/coaches')
-    await initCoaches()
-    return
-  }
+  // if (path.startsWith('/dynasty/coaches')) {
+  //   const { default: initCoaches } = await import('./dynasty/coaches')
+  //   await initCoaches()
+  //   return
+  // }
 
   if (path.startsWith('/dynasty/standings')) {
     const { default: initStandings } = await import('./dynasty/standings')
@@ -43,6 +43,12 @@ async function init() {
   if (path.startsWith('/dynasty/addStats')) {
     const { default: initAddStatsPage } = await import('./dynasty/addStats/addStats')
     await initAddStatsPage()
+    return
+  }
+
+  if (path.startsWith('/dynasty/coaches')) {
+    const { default: initCoaches } = await import('./dynasty/coaches/coaches')
+    await initCoaches()
     return
   }
 

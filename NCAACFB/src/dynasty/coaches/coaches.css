@@ -1,0 +1,127 @@
+.coaches-page {
+  min-height: 100vh;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background: #0a0a0a;
+  color: white;
+  font-family: system-ui, sans-serif;
+}
+
+.coaches-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.coaches-back-link {
+  color: #d4a017;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.coaches-nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.coaches-nav-links a {
+  color: #888;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.coaches-back-link:hover,
+.coaches-nav-links a:hover {
+  color: white;
+}
+
+.coaches-header {
+  margin-bottom: 40px;
+}
+
+.coaches-header h1 {
+  margin: 0 0 4px;
+  font-size: 40px;
+  line-height: 1.05;
+}
+
+.coaches-header p {
+  margin: 0;
+  color: #888;
+}
+
+.coaches-table-card {
+  overflow: hidden;
+  border: 1px solid #222;
+  border-radius: 12px;
+  background: #111;
+}
+
+.coaches-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.coaches-table thead tr {
+  background: #1a1a1a;
+  color: #888;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.coaches-table th,
+.coaches-table td {
+  padding: 12px;
+  border-bottom: 1px solid #222;
+  text-align: left;
+}
+
+.coaches-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.coaches-record {
+  color: #d4a017;
+  font-weight: 800;
+}
+
+.coaches-conference-record {
+  color: #888;
+}
+
+.coaches-empty-row {
+  padding: 16px;
+  color: #888;
+  text-align: center;
+}
+
+@media (max-width: 620px) {
+  .coaches-page {
+    padding: 28px 14px;
+  }
+
+  .coaches-nav {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .coaches-nav-links {
+    gap: 14px;
+  }
+
+  .coaches-header h1 {
+    font-size: 32px;
+  }
+
+  .coaches-table {
+    font-size: 14px;
+  }
+
+  .coaches-table th,
+  .coaches-table td {
+    padding: 10px 8px;
+  }
+}
