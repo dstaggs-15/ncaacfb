@@ -245,9 +245,9 @@ async function showDynasty(selectedDynastyId?: string) {
         await showDynasty(selected);
     });
 
-    document.querySelector("#logout-btn")?.addEventListener("click", async (event) => {
+    document.querySelector("#profile-btn")?.addEventListener("click", (event) => {
         event.preventDefault();
-        await signOut();
+        window.location.href = "/profile/";
     });
 
     document.querySelector("#show-create")?.addEventListener("click", () => {
