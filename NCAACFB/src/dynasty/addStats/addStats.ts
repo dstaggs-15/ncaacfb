@@ -194,7 +194,7 @@ export default async function initAddStatsPage() {
         }
 
         setStatus('Game submitted.', 'success')
-        await renderGameForm()
+        clearGameFields()
     })
   }
 
@@ -465,4 +465,35 @@ function getNumberValue(selector: string) {
 
 function getCheckedValue(selector: string) {
   return document.querySelector<HTMLInputElement>(selector)?.checked ?? false
+}
+
+function clearGameFields() {
+    setInputValue('#home-team', '')
+    setInputValue('#away-team', '')
+    setInputValue('#home-score', '')
+    setInputValue('#away-score', '')
+    setInputValue('#week', '')
+    setTextAreaValue('#game-notes', '')
+
+    const gameTypeSelect = document.querySelector<HTMLSelectElement>('#game-type')
+
+    if (gameTypeSelect) {
+        gameTypeSelect.value = 'regular_season'
+    }
+}
+
+function setInputValue(selector: string, value: string) {
+    const input = document.querySelector<HTMLInputElement>(selector)
+
+    if (input) {
+        input.value = value
+    }
+}
+
+function setTextAreaValue(selector: string, value: string) {
+    const textArea = document.querySelector<HTMLTextAreaElement>(selector)
+
+    if (textArea) {
+        textArea.value = value
+    }
 }
