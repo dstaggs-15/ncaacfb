@@ -113,6 +113,14 @@ async function init() {
         `;
     }
 
+    function formatGameWeek(week: number | null | undefined) {
+        if (week === null || week === undefined) {
+            return "Post-Season";
+        }
+
+        return `Week ${week}`;
+    }
+
     function getGameTypeLabel(game: any) {
         if (game.is_playoff) {
             return "🏆 Playoff";
@@ -142,7 +150,7 @@ async function init() {
             .map((game: any) => {
                 return `
                     <tr>
-                        <td>Week ${game.week ?? "-"}</td>
+                        <td>${formatGameWeek(game.week)}</td>
 
                         <td>
                             ${getLogoHtml(game.home_team)}
