@@ -1,120 +1,302 @@
 .season-history-page {
-  min-height: 100vh;
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  background: #0a0a0a;
-  color: white;
-  font-family: system-ui;
+    min-height: 100vh;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px 64px;
+    color: white;
+    background:
+        radial-gradient(circle at top left, rgba(212, 160, 23, 0.13), transparent 34%),
+        radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 30%),
+        #0a0a0a;
+    font-family: system-ui;
 }
 
 .season-history-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 44px;
+}
+
+.season-history-back-link,
+.season-history-nav-link {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    color: #888;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 800;
+    transition:
+        color 0.16s ease,
+        transform 0.16s ease;
 }
 
 .season-history-back-link {
-  color: #d4a017;
-  text-decoration: none;
-}
-
-.season-history-nav-links {
-  display: flex;
-  gap: 20px;
-}
-
-.season-history-nav-link {
-  color: #888;
-  text-decoration: none;
+    color: #d4a017;
 }
 
 .season-history-back-link:hover,
 .season-history-nav-link:hover {
-  text-decoration: underline;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.season-history-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.season-history-nav-link {
+    padding: 9px 13px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 999px;
+    background: rgba(17, 17, 17, 0.72);
+}
+
+.season-history-nav-link:first-child {
+    color: #111827;
+    border-color: transparent;
+    background: #d4a017;
+}
+
+.season-history-nav-link:first-child:hover {
+    color: #111827;
+    filter: brightness(1.08);
+}
+
+.season-history-header {
+    position: relative;
+    margin-bottom: 34px;
+    padding: 30px;
+    overflow: hidden;
+    border: 1px solid rgba(212, 160, 23, 0.22);
+    border-radius: 24px;
+    background:
+        linear-gradient(135deg, rgba(212, 160, 23, 0.16), transparent 46%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
+        #111;
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+}
+
+.season-history-header::before {
+    content: "";
+    position: absolute;
+    inset: -80px auto auto -80px;
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    background: rgba(212, 160, 23, 0.13);
+    filter: blur(8px);
+}
+
+.season-history-header::after {
+    content: "SEASONS";
+    position: absolute;
+    right: 24px;
+    bottom: -10px;
+    color: rgba(255, 255, 255, 0.035);
+    font-size: clamp(54px, 11vw, 112px);
+    font-weight: 1000;
+    line-height: 1;
+    letter-spacing: -0.08em;
+    pointer-events: none;
 }
 
 .season-history-header h1 {
-  margin: 0 0 4px;
-  font-size: 40px;
+    position: relative;
+    z-index: 1;
+    margin: 0 0 8px;
+    font-size: clamp(38px, 7vw, 64px);
+    line-height: 0.95;
+    letter-spacing: -0.05em;
 }
 
 .season-history-header p {
-  margin: 0 0 40px;
-  color: #888;
+    position: relative;
+    z-index: 1;
+    max-width: 580px;
+    margin: 0;
+    color: #a1a1aa;
+    font-size: 16px;
+}
+
+.season-history-content {
+    display: grid;
+    gap: 26px;
 }
 
 .season-history-season {
-  margin-bottom: 40px;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 22px;
+    background:
+        linear-gradient(145deg, rgba(212, 160, 23, 0.08), transparent 42%),
+        #101010;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
 }
 
 .season-history-season-heading {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 22px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    background: rgba(255, 255, 255, 0.025);
 }
 
 .season-history-season-heading h2 {
-  margin: 0;
-  font-size: 24px;
+    margin: 0;
+    font-size: 24px;
+    letter-spacing: -0.03em;
 }
 
 .current-season-pill {
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #d4a017;
-  color: black;
-  font-size: 12px;
-  font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: #d4a017;
+    color: #111827;
+    font-size: 12px;
+    font-weight: 1000;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    box-shadow: 0 0 24px rgba(212, 160, 23, 0.22);
 }
 
 .season-history-table {
-  width: 100%;
-  border-collapse: collapse;
-  overflow: hidden;
-  background: #111;
-  border-radius: 12px;
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
 }
 
 .season-history-table thead {
-  background: #1a1a1a;
-  color: #888;
-  font-size: 13px;
-  text-transform: uppercase;
+    color: #a1a1aa;
+    background: rgba(0, 0, 0, 0.24);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
 }
 
 .season-history-table th,
 .season-history-table td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #222;
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.11);
+}
+
+.season-history-table th {
+    font-weight: 900;
+}
+
+.season-history-table tbody tr {
+    transition:
+        background 0.16s ease,
+        transform 0.16s ease;
+}
+
+.season-history-table tbody tr:hover {
+    background: rgba(212, 160, 23, 0.06);
+}
+
+.season-history-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .season-history-score {
-  color: #d4a017;
-  font-weight: bold;
+    color: #d4a017;
+    font-weight: 1000;
+    white-space: nowrap;
 }
 
 .season-history-type {
-  color: #888;
-  font-size: 13px;
+    color: #a1a1aa;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.season-history-empty,
+.season-history-empty-row {
+    color: #888;
 }
 
 .season-history-empty {
-  color: #888;
+    padding: 28px;
+    border: 1px dashed rgba(212, 160, 23, 0.28);
+    border-radius: 18px;
+    background:
+        linear-gradient(135deg, rgba(212, 160, 23, 0.08), transparent),
+        #111;
 }
 
 .season-history-empty-row {
-  padding: 16px;
-  color: #888;
+    padding: 18px 16px;
 }
 
 .team-logo {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-  vertical-align: middle;
-  margin-right: 6px;
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    vertical-align: middle;
+    margin-right: 8px;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.35));
+}
+
+@media (max-width: 760px) {
+    .season-history-page {
+        padding: 26px 14px 44px;
+    }
+
+    .season-history-nav {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 28px;
+    }
+
+    .season-history-nav-links {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .season-history-nav-link {
+        justify-content: center;
+    }
+
+    .season-history-header {
+        padding: 24px;
+        border-radius: 20px;
+    }
+
+    .season-history-header h1 {
+        font-size: clamp(34px, 12vw, 48px);
+    }
+
+    .season-history-header::after {
+        right: 14px;
+        font-size: 58px;
+    }
+
+    .season-history-season-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .season-history-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .season-history-table th,
+    .season-history-table td {
+        padding: 12px 14px;
+    }
 }
