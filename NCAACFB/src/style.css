@@ -253,6 +253,23 @@ code {
   align-items: stretch;
 }
 
+.dynasty-nav-link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #93c5fd;
+  font: inherit;
+  font-weight: 900;
+  font-size: 16px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dynasty-nav-link:hover {
+  color: #bfdbfe;
+  text-decoration: underline;
+}
+
 .hero-content,
 .blogger-hero-content,
 .scoreboard-card,
