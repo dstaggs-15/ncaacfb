@@ -122,6 +122,22 @@ async function init() {
     }
 
     function getGameTypeLabel(game: any) {
+        if (game.game_type === "conference_championship") {
+            return "🏆 Conference Championship";
+        }
+
+        if (game.game_type === "bowl") {
+            return "🏆 Bowl Game";
+        }
+
+        if (game.game_type === "national_championship") {
+            return "🏆 National Championship";
+        }
+
+        if (game.game_type === "playoff") {
+            return "🏆 Playoff";
+        }
+
         if (game.is_playoff) {
             return "🏆 Playoff";
         }
