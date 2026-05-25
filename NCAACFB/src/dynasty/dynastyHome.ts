@@ -189,7 +189,7 @@ async function showDynasty(selectedDynastyId?: string) {
           <h2>Seasons</h2>
           <p>Track yearly records, champions, playoff brackets, bowls, and final rankings.</p>
         </a>
-        <a class="dynasty-card" href="/dynasty/coaches/">
+        <a class="dynasty-card" href="/dynasty/coaches/coaches/">
           <span class="card-kicker">Sideline Ledger</span>
           <h2>Coaches</h2>
           <p>Follow coach careers, rivalries, records, schools, and legacy arcs.</p>
