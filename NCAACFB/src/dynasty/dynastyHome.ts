@@ -123,6 +123,9 @@ async function showDynasty(selectedDynastyId?: string) {
 
   const dynastyName = dynasty?.name ?? 'No Active Dynasty'
   const dynastyStatus = dynasty?.is_active ? 'Active' : 'Inactive'
+  const activeDynastyUrl = dynasty?.id
+    ? `/dynasty/seasons/?dynastyId=${dynasty.id}`
+    : "/dynasty/seasons/";
 
   const dynastyOptions = allDynasties?.map((d: any) =>
     `<option value="${d.id}" ${d.id === dynasty?.id ? 'selected' : ''}>${d.name}</option>`
@@ -149,7 +152,7 @@ async function showDynasty(selectedDynastyId?: string) {
             Track teams, coaches, records, seasons, rivalries, playoff runs, and every bit of digital football folklore your league creates.
           </p>
           <div class="hero-actions">
-            <a class="primary-button" href="/dynasty/seasons/?dynastyId=${dynasty.id}">View Seasons</a>
+            <a class="primary-button" href="${activeDynastyUrl}">View Seasons</a>
             <a class="primary-button" href="/dynasty/recruitment/recruitment/">Sell Calculator</a>
             <a class="primary-button" href="/dynasty/addStats/">+ Add Stats</a>
           </div>
@@ -184,7 +187,7 @@ async function showDynasty(selectedDynastyId?: string) {
           <h2>Teams</h2>
           <p>View user teams, CPU teams, records, conferences, and program history.</p>
         </a>
-        <a class="dynasty-card" href="/dynasty/seasons/">
+        <a class="dynasty-card" href="${activeDynastyUrl}">
           <span class="card-kicker">Yearbook</span>
           <h2>Seasons</h2>
           <p>Track yearly records, champions, playoff brackets, bowls, and final rankings.</p>
