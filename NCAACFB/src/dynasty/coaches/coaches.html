@@ -4,23 +4,69 @@
       <a href="/dynasty/" class="coaches-back-link">← Dynasty</a>
 
       <div class="coaches-nav-links">
+        <a href="/dynasty/add/">+ Add Stats</a>
         <a href="/home/">Home</a>
       </div>
     </nav>
 
     <header class="coaches-hero">
       <p class="coaches-kicker">Coach Records</p>
-      <h1 id="coaches-dynasty-name">Dynasty</h1>
+      <h1>Coaches</h1>
       <p>
-        Track each coach’s team, overall record, and conference record for the active dynasty.
+        Pick a dynasty, choose a coach, and view their record details.
       </p>
     </header>
+
+    <section class="coaches-picker-grid">
+      <article class="coaches-picker-card">
+        <div class="coaches-card-header">
+          <p class="coaches-card-kicker">Step 1</p>
+          <h2>Choose a Dynasty</h2>
+        </div>
+
+        <label class="coaches-label" for="dynasty-select">
+          Dynasty
+        </label>
+
+        <select id="dynasty-select" class="coaches-select">
+          <option value="">Choose a dynasty</option>
+        </select>
+      </article>
+
+      <article class="coaches-picker-card">
+        <div class="coaches-card-header">
+          <p class="coaches-card-kicker">Step 2</p>
+          <h2>Choose a Coach</h2>
+        </div>
+
+        <div class="coaches-mini-table-wrap">
+          <table class="coaches-mini-table">
+            <thead>
+              <tr>
+                <th>Coach</th>
+                <th>Team</th>
+              </tr>
+            </thead>
+
+            <tbody id="coach-list-body">
+              <tr>
+                <td colspan="2" class="coaches-empty-row">
+                  Choose a dynasty to see the coaches.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
 
     <section class="coaches-table-card">
       <div class="coaches-table-header">
         <div>
-          <h2>Records</h2>
-          <p>Sorted by most wins.</p>
+          <h2>Selected Coach Record</h2>
+          <p id="selected-coach-summary">
+            Choose a coach to view their record.
+          </p>
         </div>
       </div>
 
@@ -37,7 +83,9 @@
 
           <tbody id="coaches-table-body">
             <tr>
-              <td colspan="4" class="coaches-empty-row">Loading coach records...</td>
+              <td colspan="4" class="coaches-empty-row">
+                No coach selected.
+              </td>
             </tr>
           </tbody>
         </table>

@@ -58,10 +58,11 @@
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
 }
 
-.coaches-kicker {
+.coaches-kicker,
+.coaches-card-kicker {
   margin: 0 0 8px;
   color: #d4a017;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -74,7 +75,7 @@
   letter-spacing: -0.04em;
 }
 
-.coaches-hero p {
+.coaches-hero p:last-child {
   max-width: 620px;
   margin: 12px 0 0;
   color: #c7c7c7;
@@ -82,12 +83,112 @@
   line-height: 1.6;
 }
 
+.coaches-picker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.coaches-picker-card,
 .coaches-table-card {
   overflow: hidden;
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: 20px;
   background: rgba(17, 17, 17, 0.96);
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+}
+
+.coaches-picker-card {
+  padding: 20px;
+}
+
+.coaches-card-header {
+  margin-bottom: 18px;
+}
+
+.coaches-card-header h2,
+.coaches-table-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.coaches-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.coaches-select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid rgba(212, 160, 23, 0.32);
+  border-radius: 12px;
+  outline: none;
+  background: #0f172a;
+  color: #f4f5f6;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.coaches-select:focus {
+  border-color: #d4a017;
+  box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.16);
+}
+
+.coaches-mini-table-wrap,
+.coaches-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.coaches-mini-table,
+.coaches-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.coaches-mini-table thead tr,
+.coaches-table thead tr {
+  background: #1a1a1a;
+}
+
+.coaches-mini-table th,
+.coaches-table th {
+  padding: 14px 16px;
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.coaches-mini-table td,
+.coaches-table td {
+  padding: 16px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  color: #f4f5f6;
+  font-size: 15px;
+}
+
+.coaches-selectable-row {
+  cursor: pointer;
+  transition:
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+.coaches-selectable-row:hover {
+  background: rgba(212, 160, 23, 0.055);
+}
+
+.coaches-selectable-row.is-selected {
+  background: rgba(212, 160, 23, 0.12);
+  box-shadow: inset 4px 0 0 #d4a017;
 }
 
 .coaches-table-header {
@@ -100,57 +201,14 @@
   background: rgba(255, 255, 255, 0.025);
 }
 
-.coaches-table-header h2 {
-  margin: 0;
-  font-size: 18px;
-}
-
 .coaches-table-header p {
   margin: 4px 0 0;
   color: #888;
   font-size: 14px;
 }
 
-.coaches-table-wrap {
-  width: 100%;
-  overflow-x: auto;
-}
-
 .coaches-table {
-  width: 100%;
   min-width: 620px;
-  border-collapse: collapse;
-}
-
-.coaches-table thead tr {
-  background: #1a1a1a;
-}
-
-.coaches-table th {
-  padding: 14px 16px;
-  color: #9ca3af;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-align: left;
-  text-transform: uppercase;
-}
-
-.coaches-table td {
-  padding: 16px;
-  border-top: 1px solid rgba(148, 163, 184, 0.12);
-  color: #f4f5f6;
-  font-size: 15px;
-}
-
-.coaches-table tbody tr {
-  transition:
-    background 0.16s ease,
-    transform 0.16s ease;
-}
-
-.coaches-table tbody tr:hover {
-  background: rgba(212, 160, 23, 0.055);
 }
 
 .coaches-name {
@@ -181,7 +239,7 @@
   color: #fca5a5;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 760px) {
   .coaches-page {
     padding: 24px 14px;
   }
@@ -200,6 +258,10 @@
   .coaches-hero {
     padding: 22px;
     border-radius: 18px;
+  }
+
+  .coaches-picker-grid {
+    grid-template-columns: 1fr;
   }
 
   .coaches-table-header {

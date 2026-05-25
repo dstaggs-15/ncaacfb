@@ -5,6 +5,11 @@ import coachesHtml from "./coaches.html?raw";
 import { supabase } from "../../supabase";
 import { getAllDynasties } from "../dynastyData";
 
+type Dynasty = {
+  id: string;
+  name: string;
+};
+
 type CoachRecord = {
   id: string;
   dynasty_id: string;
@@ -19,39 +24,98 @@ type CoachRecord = {
   } | null;
 };
 
+let currentCoaches: CoachRecord[] = [];
+let selectedCoachId = "";
+
 async function init() {
   const app = document.querySelector<HTMLDivElement>("#app")!;
-
   app.innerHTML = coachesHtml;
 
-  const dynastyNameEl = document.querySelector<HTMLHeadingElement>(
-    "#coaches-dynasty-name"
-  );
+  const dynastySelect =
+    document.querySelector<HTMLSelectElement>("#dynasty-select");
 
-  const tableBody = document.querySelector<HTMLTableSectionElement>(
-    "#coaches-table-body"
-  );
+  const coachListBody =
+    document.querySelector<HTMLTableSectionElement>("#coach-list-body");
 
-  if (!dynastyNameEl || !tableBody) {
+  const recordsTableBody =
+    document.querySelector<HTMLTableSectionElement>("#coaches-table-body");
+
+  const selectedCoachSummary =
+    document.querySelector<HTMLParagraphElement>("#selected-coach-summary");
+
+  if (
+    !dynastySelect ||
+    !coachListBody ||
+    !recordsTableBody ||
+    !selectedCoachSummary
+  ) {
     console.error("Coaches page elements were not found.");
     return;
   }
 
-  const dynasties = await getAllDynasties();
-  const activeDynasty = dynasties[0];
+  const dynasties = (await getAllDynasties()) as Dynasty[];
 
-  if (!activeDynasty) {
-    app.innerHTML = `
-      <main class="coaches-page">
-        <p class="coaches-empty-row">No dynasty found.</p>
-      </main>
-    `;
-    return;
-  }
+  renderDynastyOptions(dynastySelect, dynasties);
 
-  dynastyNameEl.textContent = activeDynasty.name;
+  dynastySelect.addEventListener("change", async () => {
+    const dynastyId = dynastySelect.value;
 
-  const { data: records, error } = await supabase
+    selectedCoachId = "";
+    currentCoaches = [];
+
+    renderNoSelectedCoach(recordsTableBody, selectedCoachSummary);
+
+    if (!dynastyId) {
+      renderCoachIdle(coachListBody);
+      return;
+    }
+
+    await loadCoachesForDynasty(dynastyId, coachListBody);
+  });
+
+  coachListBody.addEventListener("click", (event) => {
+    const row = (event.target as HTMLElement).closest<HTMLTableRowElement>(
+      "[data-coach-id]"
+    );
+
+    if (!row) return;
+
+    selectedCoachId = row.dataset.coachId ?? "";
+
+    renderCoachList(coachListBody, currentCoaches, selectedCoachId);
+    renderSelectedCoach(recordsTableBody, selectedCoachSummary);
+  });
+}
+
+function renderDynastyOptions(
+  dynastySelect: HTMLSelectElement,
+  dynasties: Dynasty[]
+) {
+  const optionsHtml = dynasties
+    .map((dynasty) => {
+      return `<option value="${dynasty.id}">${dynasty.name}</option>`;
+    })
+    .join("");
+
+  dynastySelect.innerHTML = `
+    <option value="">Choose a dynasty</option>
+    ${optionsHtml}
+  `;
+}
+
+async function loadCoachesForDynasty(
+  dynastyId: string,
+  coachListBody: HTMLTableSectionElement
+) {
+  coachListBody.innerHTML = `
+    <tr>
+      <td colspan="2" class="coaches-empty-row">
+        Loading coaches...
+      </td>
+    </tr>
+  `;
+
+  const { data, error } = await supabase
     .from("coaches")
     .select(`
       *,
@@ -59,51 +123,111 @@ async function init() {
         username
       )
     `)
-    .eq("dynasty_id", activeDynasty.id)
+    .eq("dynasty_id", dynastyId)
     .order("wins", { ascending: false });
 
   if (error) {
-    console.error("Error loading coach records:", error);
+    console.error("Error loading coaches:", error);
 
-    tableBody.innerHTML = `
+    coachListBody.innerHTML = `
       <tr>
-        <td colspan="4" class="coaches-empty-row">
-          Could not load coach records.
+        <td colspan="2" class="coaches-empty-row coaches-error">
+          Could not load coaches.
         </td>
       </tr>
     `;
     return;
   }
 
-  const coachRecords = (records ?? []) as CoachRecord[];
+  currentCoaches = (data ?? []) as CoachRecord[];
 
-  if (coachRecords.length === 0) {
-    tableBody.innerHTML = `
+  renderCoachList(coachListBody, currentCoaches, selectedCoachId);
+}
+
+function renderCoachIdle(coachListBody: HTMLTableSectionElement) {
+  coachListBody.innerHTML = `
+    <tr>
+      <td colspan="2" class="coaches-empty-row">
+        Choose a dynasty to see the coaches.
+      </td>
+    </tr>
+  `;
+}
+
+function renderCoachList(
+  coachListBody: HTMLTableSectionElement,
+  coaches: CoachRecord[],
+  activeCoachId: string
+) {
+  if (coaches.length === 0) {
+    coachListBody.innerHTML = `
       <tr>
-        <td colspan="4" class="coaches-empty-row">
-          No coach records yet.
+        <td colspan="2" class="coaches-empty-row">
+          No coaches added to this dynasty yet.
         </td>
       </tr>
     `;
     return;
   }
 
-    tableBody.innerHTML = coachRecords
-    .map((record) => {
-        const coachName = record.profiles?.username ?? "Unknown";
+  coachListBody.innerHTML = coaches
+    .map((coach) => {
+      const coachName = coach.profiles?.username ?? "Unknown";
+      const isActive = coach.id === activeCoachId;
 
-        return `
-            <tr>
-                <td class="coaches-name">${coachName}</td>
-                <td class="coaches-team">${record.team}</td>
-                <td class="coaches-record">${record.wins}-${record.losses}</td>
-                <td class="coaches-conference-record">
-                    ${record.conference_wins}-${record.conference_losses}
-                </td>
-            </tr>
-        `;
+      return `
+        <tr 
+          class="coaches-selectable-row ${isActive ? "is-selected" : ""}"
+          data-coach-id="${coach.id}"
+        >
+          <td class="coaches-name">${coachName}</td>
+          <td class="coaches-team">${coach.team}</td>
+        </tr>
+      `;
     })
     .join("");
+}
+
+function renderNoSelectedCoach(
+  recordsTableBody: HTMLTableSectionElement,
+  selectedCoachSummary: HTMLParagraphElement
+) {
+  selectedCoachSummary.textContent = "Choose a coach to view their record.";
+
+  recordsTableBody.innerHTML = `
+    <tr>
+      <td colspan="4" class="coaches-empty-row">
+        No coach selected.
+      </td>
+    </tr>
+  `;
+}
+
+function renderSelectedCoach(
+  recordsTableBody: HTMLTableSectionElement,
+  selectedCoachSummary: HTMLParagraphElement
+) {
+  const coach = currentCoaches.find((item) => item.id === selectedCoachId);
+
+  if (!coach) {
+    renderNoSelectedCoach(recordsTableBody, selectedCoachSummary);
+    return;
+  }
+
+  const coachName = coach.profiles?.username ?? "Unknown";
+
+  selectedCoachSummary.textContent = `${coachName} • ${coach.team}`;
+
+  recordsTableBody.innerHTML = `
+    <tr>
+      <td class="coaches-name">${coachName}</td>
+      <td class="coaches-team">${coach.team}</td>
+      <td class="coaches-record">${coach.wins}-${coach.losses}</td>
+      <td class="coaches-conference-record">
+        ${coach.conference_wins}-${coach.conference_losses}
+      </td>
+    </tr>
+  `;
 }
 
 export default init;
