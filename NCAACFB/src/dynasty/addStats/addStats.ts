@@ -47,7 +47,7 @@ export default async function initAddStatsPage() {
 
   async function getSeasonOptions(dynastyId: string) {
     if (!dynastyId) {
-      return '<option value="">No dynasty selected</option>'
+      return '<option value="">Choose a season</option>'
     }
 
     const { data, error } = await supabase
@@ -72,8 +72,7 @@ export default async function initAddStatsPage() {
   async function renderGameForm() {
     setActiveTab('game')
 
-    const firstDynastyId = dynasties[0]?.id ?? ''
-    const seasonOptions = await getSeasonOptions(firstDynastyId)
+    const seasonOptions = await getSeasonOptions('')
 
     formArea.innerHTML = `
         <form id="game-form" class="add-stats-form">
@@ -86,8 +85,8 @@ export default async function initAddStatsPage() {
 
             <label>
             Season
-            <select id="game-season-id" required>
-                ${seasonOptions}
+            <select id="game-season-id" required disabled>
+              ${seasonOptions}
             </select>
             </label>
 
@@ -146,6 +145,7 @@ export default async function initAddStatsPage() {
       const seasonSelect = document.querySelector<HTMLSelectElement>('#game-season-id')
 
       if (seasonSelect) {
+        seasonSelect.disabled = !dynastyId
         seasonSelect.innerHTML = await getSeasonOptions(dynastyId)
       }
     })
@@ -328,8 +328,7 @@ export default async function initAddStatsPage() {
   async function renderTrophyForm() {
     setActiveTab('trophy')
 
-    const firstDynastyId = dynasties[0]?.id ?? ''
-    const seasonOptions = await getSeasonOptions(firstDynastyId)
+    const seasonOptions = await getSeasonOptions('')
 
     formArea.innerHTML = `
       <form id="trophy-form" class="add-stats-form">
@@ -342,7 +341,7 @@ export default async function initAddStatsPage() {
 
         <label>
           Season
-          <select id="trophy-season-id" required>
+          <select id="trophy-season-id" required disabled>
             ${seasonOptions}
           </select>
         </label>
@@ -378,6 +377,7 @@ export default async function initAddStatsPage() {
       const seasonSelect = document.querySelector<HTMLSelectElement>('#trophy-season-id')
 
       if (seasonSelect) {
+        seasonSelect.disabled = !dynastyId
         seasonSelect.innerHTML = await getSeasonOptions(dynastyId)
       }
     })
@@ -429,13 +429,16 @@ export default async function initAddStatsPage() {
 }
 
 function buildDynastyOptions(dynasties: Dynasty[]) {
-  if (!dynasties.length) {
-    return '<option value="">No dynasties found</option>'
-  }
+	if (!dynasties.length) {
+		return '<option value="">No dynasties found</option>'
+	}
 
-  return dynasties
-    .map((dynasty) => `<option value="${dynasty.id}">${dynasty.name}</option>`)
-    .join('')
+	return `
+		<option value="">Choose a dynasty</option>
+		${dynasties
+			.map((dynasty) => `<option value="${dynasty.id}">${dynasty.name}</option>`)
+			.join('')}
+	`
 }
 
 function getInputValue(selector: string) {
