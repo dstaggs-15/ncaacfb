@@ -88,20 +88,20 @@ async function init() {
     return;
   }
 
-  tableBody.innerHTML = coachRecords
+    tableBody.innerHTML = coachRecords
     .map((record) => {
-      const coachName = record.profiles?.username ?? "Unknown";
+        const coachName = record.profiles?.username ?? "Unknown";
 
-      return `
-        <tr>
-          <td>${coachName}</td>
-          <td>${record.team}</td>
-          <td class="coaches-record">${record.wins}-${record.losses}</td>
-          <td class="coaches-conference-record">
-            ${record.conference_wins}-${record.conference_losses}
-          </td>
-        </tr>
-      `;
+        return `
+            <tr>
+                <td class="coaches-name">${coachName}</td>
+                <td class="coaches-team">${record.team}</td>
+                <td class="coaches-record">${record.wins}-${record.losses}</td>
+                <td class="coaches-conference-record">
+                    ${record.conference_wins}-${record.conference_losses}
+                </td>
+            </tr>
+        `;
     })
     .join("");
 }
