@@ -116,7 +116,9 @@ export default async function initAddStatsPage() {
 
             <label>
             Week
-            <input id="week" type="number" placeholder="1" />
+            <select id="week">
+                ${buildWeekOptions()}
+            </select>
             </label>
 
             <label>
@@ -159,7 +161,7 @@ export default async function initAddStatsPage() {
         const awayTeam = getInputValue('#away-team')
         const homeScore = getNumberValue('#home-score')
         const awayScore = getNumberValue('#away-score')
-        const week = getNumberValue('#week')
+        const week = getWeekValue('#week')
         const gameType = getSelectValue('#game-type')
         const isRivalry = gameType === 'rivalry'
         const isPlayoff =
@@ -441,6 +443,19 @@ function buildDynastyOptions(dynasties: Dynasty[]) {
 	`
 }
 
+function buildWeekOptions() {
+    const weekOptions = Array.from({ length: 16 }, (_, index) => {
+        const selected = index === 1 ? ' selected' : ''
+
+        return `<option value="${index}"${selected}>Week ${index}</option>`
+    }).join('')
+
+    return `
+        ${weekOptions}
+        <option value="">Post-Season</option>
+    `
+}
+
 function getInputValue(selector: string) {
   return document.querySelector<HTMLInputElement>(selector)?.value.trim() ?? ''
 }
@@ -463,6 +478,16 @@ function getNumberValue(selector: string) {
   return Number(value)
 }
 
+function getWeekValue(selector: string) {
+    const value = document.querySelector<HTMLSelectElement>(selector)?.value
+
+    if (value === undefined || value === '') {
+        return null
+    }
+
+    return Number(value)
+}
+
 function getCheckedValue(selector: string) {
   return document.querySelector<HTMLInputElement>(selector)?.checked ?? false
 }
@@ -472,7 +497,7 @@ function clearGameFields() {
     setInputValue('#away-team', '')
     setInputValue('#home-score', '')
     setInputValue('#away-score', '')
-    setInputValue('#week', '')
+    setSelectValue('#week', '1')
     setTextAreaValue('#game-notes', '')
 
     const gameTypeSelect = document.querySelector<HTMLSelectElement>('#game-type')
@@ -487,6 +512,14 @@ function setInputValue(selector: string, value: string) {
 
     if (input) {
         input.value = value
+    }
+}
+
+function setSelectValue(selector: string, value: string) {
+    const select = document.querySelector<HTMLSelectElement>(selector)
+
+    if (select) {
+        select.value = value
     }
 }
 
