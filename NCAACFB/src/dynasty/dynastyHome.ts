@@ -138,7 +138,6 @@ async function showDynasty(selectedDynastyId?: string) {
         <div>
           <a href="/dynasty/">Dynasty</a>
           <a href="/blogger/">Blogger</a>
-          <a href="/dynasty/addStats/">+ Add Stats</a>
           <a href="#" id="logout-btn" style="color: #f87171;">Log Out</a>
         </div>
       </nav>
