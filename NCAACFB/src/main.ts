@@ -21,12 +21,18 @@ async function init() {
     setupHomePage()
     return
   }
+  
+  if (path.startsWith('/profile')) {
+    const { setupUserProfilePage } = await import('./profile/userProfile')
+    setupUserProfilePage()
+    return
+  }
 
-if (path.startsWith("/dynasty/seasons")) {
+  if (path.startsWith("/dynasty/seasons")) {
     const { default: setupSeasonsPage } = await import("./dynasty/seasons/seasons");
     setupSeasonsPage();
     return;
-}
+  }
 
   if (path.startsWith('/dynasty/standings')) {
     const { default: initStandings } = await import('./dynasty/standings')
