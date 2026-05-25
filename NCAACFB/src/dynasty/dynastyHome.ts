@@ -149,7 +149,7 @@ async function showDynasty(selectedDynastyId?: string) {
             Track teams, coaches, records, seasons, rivalries, playoff runs, and every bit of digital football folklore your league creates.
           </p>
           <div class="hero-actions">
-            <a class="primary-button" href="/dynasty/seasons/">View Dynasties</a>
+            <a class="primary-button" href="/dynasty/seasons/?dynastyId=${dynasty.id}">View Seasons</a>
             <a class="primary-button" href="/dynasty/recruitment/recruitment/">Sell Calculator</a>
             <a class="primary-button" href="/dynasty/addStats/">+ Add Stats</a>
           </div>
