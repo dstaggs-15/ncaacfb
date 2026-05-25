@@ -25,7 +25,7 @@ type CoachRecord = {
 };
 
 let currentCoaches: CoachRecord[] = [];
-let selectedCoachId = "";
+let selectedCoachIds = new Set<string>();
 
 async function init() {
   const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -57,34 +57,42 @@ async function init() {
 
   renderDynastyOptions(dynastySelect, dynasties);
 
-  dynastySelect.addEventListener("change", async () => {
+    dynastySelect.addEventListener("change", async () => {
     const dynastyId = dynastySelect.value;
 
-    selectedCoachId = "";
+    selectedCoachIds.clear();
     currentCoaches = [];
 
-    renderNoSelectedCoach(recordsTableBody, selectedCoachSummary);
+    renderNoSelectedCoaches(recordsTableBody, selectedCoachSummary);
 
     if (!dynastyId) {
-      renderCoachIdle(coachListBody);
-      return;
+        renderCoachIdle(coachListBody);
+        return;
     }
 
     await loadCoachesForDynasty(dynastyId, coachListBody);
-  });
+    });
 
-  coachListBody.addEventListener("click", (event) => {
+    coachListBody.addEventListener("click", (event) => {
     const row = (event.target as HTMLElement).closest<HTMLTableRowElement>(
-      "[data-coach-id]"
+        "[data-coach-id]"
     );
 
     if (!row) return;
 
-    selectedCoachId = row.dataset.coachId ?? "";
+    const coachId = row.dataset.coachId;
 
-    renderCoachList(coachListBody, currentCoaches, selectedCoachId);
-    renderSelectedCoach(recordsTableBody, selectedCoachSummary);
-  });
+    if (!coachId) return;
+
+    if (selectedCoachIds.has(coachId)) {
+        selectedCoachIds.delete(coachId);
+    } else {
+        selectedCoachIds.add(coachId);
+    }
+
+    renderCoachList(coachListBody, currentCoaches, selectedCoachIds);
+    renderSelectedCoaches(recordsTableBody, selectedCoachSummary);
+    });
 }
 
 function renderDynastyOptions(
@@ -141,7 +149,7 @@ async function loadCoachesForDynasty(
 
   currentCoaches = (data ?? []) as CoachRecord[];
 
-  renderCoachList(coachListBody, currentCoaches, selectedCoachId);
+  renderCoachList(coachListBody, currentCoaches, selectedCoachIds);
 }
 
 function renderCoachIdle(coachListBody: HTMLTableSectionElement) {
@@ -157,7 +165,7 @@ function renderCoachIdle(coachListBody: HTMLTableSectionElement) {
 function renderCoachList(
   coachListBody: HTMLTableSectionElement,
   coaches: CoachRecord[],
-  activeCoachId: string
+  activeCoachIds: Set<string>
 ) {
   if (coaches.length === 0) {
     coachListBody.innerHTML = `
@@ -173,7 +181,7 @@ function renderCoachList(
   coachListBody.innerHTML = coaches
     .map((coach) => {
       const coachName = coach.profiles?.username ?? "Unknown";
-      const isActive = coach.id === activeCoachId;
+      const isActive = activeCoachIds.has(coach.id);
 
       return `
         <tr 
@@ -188,46 +196,55 @@ function renderCoachList(
     .join("");
 }
 
-function renderNoSelectedCoach(
+function renderNoSelectedCoaches(
   recordsTableBody: HTMLTableSectionElement,
   selectedCoachSummary: HTMLParagraphElement
 ) {
-  selectedCoachSummary.textContent = "Choose a coach to view their record.";
+  selectedCoachSummary.textContent = "Choose one or more coaches to view their records.";
 
   recordsTableBody.innerHTML = `
     <tr>
       <td colspan="4" class="coaches-empty-row">
-        No coach selected.
+        No coaches selected.
       </td>
     </tr>
   `;
 }
 
-function renderSelectedCoach(
+function renderSelectedCoaches(
   recordsTableBody: HTMLTableSectionElement,
   selectedCoachSummary: HTMLParagraphElement
 ) {
-  const coach = currentCoaches.find((item) => item.id === selectedCoachId);
+  const selectedCoaches = currentCoaches.filter((coach) =>
+    selectedCoachIds.has(coach.id)
+  );
 
-  if (!coach) {
-    renderNoSelectedCoach(recordsTableBody, selectedCoachSummary);
+  if (selectedCoaches.length === 0) {
+    renderNoSelectedCoaches(recordsTableBody, selectedCoachSummary);
     return;
   }
 
-  const coachName = coach.profiles?.username ?? "Unknown";
+  selectedCoachSummary.textContent =
+    selectedCoaches.length === 1
+      ? "1 coach selected."
+      : `${selectedCoaches.length} coaches selected.`;
 
-  selectedCoachSummary.textContent = `${coachName} • ${coach.team}`;
+  recordsTableBody.innerHTML = selectedCoaches
+    .map((coach) => {
+      const coachName = coach.profiles?.username ?? "Unknown";
 
-  recordsTableBody.innerHTML = `
-    <tr>
-      <td class="coaches-name">${coachName}</td>
-      <td class="coaches-team">${coach.team}</td>
-      <td class="coaches-record">${coach.wins}-${coach.losses}</td>
-      <td class="coaches-conference-record">
-        ${coach.conference_wins}-${coach.conference_losses}
-      </td>
-    </tr>
-  `;
+      return `
+        <tr>
+          <td class="coaches-name">${coachName}</td>
+          <td class="coaches-team">${coach.team}</td>
+          <td class="coaches-record">${coach.wins}-${coach.losses}</td>
+          <td class="coaches-conference-record">
+            ${coach.conference_wins}-${coach.conference_losses}
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
 }
 
 export default init;
