@@ -1,0 +1,176 @@
+<div id="dynasty-login-view" class="dynasty-login-view hidden">
+    <section class="login-card">
+        <h1>CFB Dynasty</h1>
+        <p>Sign in to continue</p>
+
+        <div class="login-form">
+            <input id="email" type="email" placeholder="Email" />
+            <input id="password" type="password" placeholder="Password" />
+
+            <button id="login-btn" class="primary-button">
+                Log In
+            </button>
+
+            <p id="login-msg" class="form-message"></p>
+        </div>
+    </section>
+</div>
+
+<main id="dynasty-empty-view" class="dynasty-page hidden">
+    <nav class="dynasty-nav">
+        <a href="/home/">← Home</a>
+
+        <div>
+            <a href="#" id="empty-logout-btn" class="danger-link">Log Out</a>
+        </div>
+    </nav>
+
+    <section class="empty-dynasty-panel">
+        <p class="eyebrow">Dynasty Hub</p>
+        <h1>No dynasties yet</h1>
+        <p>Create your first dynasty to start tracking seasons, coaches, teams, records, and league lore.</p>
+
+        <button id="empty-create-btn" class="primary-button">
+            + Create Dynasty
+        </button>
+
+        <div id="empty-create-form" class="compact-form hidden">
+            <input id="empty-dynasty-name" type="text" placeholder="Dynasty name" />
+
+            <button id="empty-submit-dynasty" class="primary-button">
+                Create
+            </button>
+
+            <p id="empty-create-msg" class="form-message"></p>
+        </div>
+    </section>
+</main>
+
+<main id="dynasty-dashboard-view" class="dynasty-page hidden">
+    <nav class="dynasty-nav">
+        <a href="/home/">← Home</a>
+
+        <div>
+            <a href="/dynasty/">Dynasty</a>
+            <a href="/blogger/">Blogger</a>
+            <a href="#" id="logout-btn" class="danger-link">Log Out</a>
+        </div>
+    </nav>
+
+    <section class="dynasty-hero">
+        <div class="hero-content">
+            <p class="eyebrow">CFB26 Multiplayer Hub</p>
+            <h1>Dynasty Companion</h1>
+
+            <p class="hero-copy">
+                Track teams, coaches, records, seasons, rivalries, playoff runs, and every bit of digital football folklore your league creates.
+            </p>
+
+            <div class="hero-actions">
+                <a id="view-seasons-link" class="primary-button" href="/dynasty/seasons/">
+                    View Seasons
+                </a>
+
+                <a id="recruitment-link" class="primary-button" href="/dynasty/recruitment/recruitment/">
+                    Sell Calculator
+                </a>
+
+                <a id="add-stats-link" class="primary-button" href="/dynasty/addStats/addStats/">
+                    + Add Stats
+                </a>
+            </div>
+        </div>
+
+        <aside class="scoreboard-card">
+            <p class="scoreboard-label">Active Dynasty</p>
+
+            <select id="dynasty-selector" class="dynasty-selector"></select>
+
+            <div class="score-row">
+                <span>Status</span>
+                <strong id="dynasty-status">Active</strong>
+            </div>
+        </aside>
+    </section>
+
+    <section class="dynasty-grid">
+        <a id="teams-link" class="dynasty-card" href="/dynasty/teams/">
+            <span class="card-kicker">Roster Room</span>
+            <h2>Teams</h2>
+            <p>View user teams, CPU teams, records, conferences, and program history.</p>
+        </a>
+
+        <a id="seasons-link" class="dynasty-card" href="/dynasty/seasons/">
+            <span class="card-kicker">Yearbook</span>
+            <h2>Seasons</h2>
+            <p>Track yearly records, champions, playoff brackets, bowls, and final rankings.</p>
+        </a>
+
+        <a id="coaches-link" class="dynasty-card" href="/dynasty/coaches/coaches/">
+            <span class="card-kicker">Sideline Ledger</span>
+            <h2>Coaches</h2>
+            <p>Follow coach careers, rivalries, records, schools, and legacy arcs.</p>
+        </a>
+
+        <a id="standings-link" class="dynasty-card" href="/dynasty/standings/">
+            <span class="card-kicker">Conference Table</span>
+            <h2>Standings</h2>
+            <p>See who is rising, collapsing, surviving, or becoming bulletin-board material.</p>
+        </a>
+    </section>
+
+    <section class="activity-panel">
+        <div>
+            <p class="eyebrow">Manage Dynasties</p>
+            <h2>Create or invite</h2>
+            <p>Start a new dynasty or invite someone to yours.</p>
+
+            <div class="manage-actions">
+                <button id="show-create" class="primary-button">
+                    + Create Dynasty
+                </button>
+
+                <button id="show-invite" class="secondary-button">
+                    Invite Member
+                </button>
+            </div>
+
+            <div id="create-form" class="compact-form hidden">
+                <input id="new-dynasty-name" type="text" placeholder="Dynasty name" />
+
+                <button id="submit-create" class="primary-button">
+                    Create
+                </button>
+
+                <p id="create-msg" class="form-message"></p>
+            </div>
+
+            <div id="invite-form" class="compact-form hidden">
+                <input id="invite-email" type="email" placeholder="User email" />
+
+                <button id="submit-invite" class="primary-button">
+                    Invite
+                </button>
+
+                <p id="invite-msg" class="form-message"></p>
+            </div>
+        </div>
+
+        <div class="activity-list">
+            <div class="activity-item">
+                <span>Dynasty</span>
+                <strong id="active-dynasty-name">No Active Dynasty</strong>
+            </div>
+
+            <div class="activity-item">
+                <span>Status</span>
+                <strong id="active-dynasty-status">Inactive</strong>
+            </div>
+
+            <div class="activity-item">
+                <span>Your Dynasties</span>
+                <strong id="dynasty-count">0</strong>
+            </div>
+        </div>
+    </section>
+</main>
