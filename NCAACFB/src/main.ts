@@ -28,12 +28,6 @@ async function init() {
     return
   }
 
-  // if (path.startsWith('/dynasty/coaches')) {
-  //   const { default: initCoaches } = await import('./dynasty/coaches')
-  //   await initCoaches()
-  //   return
-  // }
-
   if (path.startsWith('/dynasty/standings')) {
     const { default: initStandings } = await import('./dynasty/standings')
     await initStandings()
