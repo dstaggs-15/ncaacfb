@@ -3,14 +3,7 @@ import "./dynastyHome.css";
 import dynastyHomeHtml from "./dynastyHome.html?raw";
 
 import { supabase } from "../supabase";
-
-function getStoredDynastyId(userId: string) {
-    return localStorage.getItem(`activeDynastyId:${userId}`);
-}
-
-function setStoredDynastyId(userId: string, dynastyId: string) {
-    localStorage.setItem(`activeDynastyId:${userId}`, dynastyId);
-}
+import { getStoredDynastyId, setStoredDynastyId } from "./dynastyData";
 
 function showElement(element: HTMLElement) {
     element.classList.remove("hidden");
