@@ -1,0 +1,58 @@
+<section class="edit-stats-page">
+  <main class="edit-stats-card">
+    <header class="edit-stats-header">
+      <div>
+        <p class="eyebrow">Dynasty Control Room</p>
+        <h1>Edit Stats</h1>
+        <p>Choose a dynasty, select an existing record, then update or delete it.</p>
+      </div>
+
+      <a class="back-link" href="/dynasty/">Back to Dynasty</a>
+    </header>
+
+    <section class="edit-stats-controls">
+      <label>
+        Dynasty
+        <select id="edit-dynasty-id">
+          <option value="">Loading dynasties...</option>
+        </select>
+      </label>
+
+      <label>
+        Record Type
+        <select id="edit-record-type">
+          <option value="game">Games</option>
+          <option value="season" disabled>Seasons coming soon</option>
+          <option value="team" disabled>Teams coming soon</option>
+          <option value="trophy" disabled>Trophies coming soon</option>
+        </select>
+      </label>
+    </section>
+
+    <p id="status-message" class="status-message"></p>
+
+    <section class="edit-stats-layout">
+      <aside class="records-panel">
+        <div class="panel-heading">
+          <h2>Existing Records</h2>
+          <p id="records-helper-text">Choose a dynasty to see games.</p>
+        </div>
+
+        <div id="records-list" class="records-list empty-state">
+          Choose a dynasty to see games.
+        </div>
+      </aside>
+
+      <section class="editor-panel">
+        <div class="panel-heading">
+          <h2>Selected Record</h2>
+          <p>Edit the selected game here.</p>
+        </div>
+
+        <div id="editor-area" class="editor-area empty-state">
+          Select a game to edit.
+        </div>
+      </section>
+    </section>
+  </main>
+</section>

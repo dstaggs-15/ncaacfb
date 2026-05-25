@@ -46,6 +46,12 @@ async function init() {
     return
   }
 
+  if (path.startsWith('/dynasty/editStats')) {
+    const { default: initEditStatsPage } = await import('./dynasty/editStats/editStats')
+    initEditStatsPage()
+    return
+  }
+
   if (path.startsWith('/dynasty/coaches')) {
     const { default: initCoaches } = await import('./dynasty/coaches/coaches')
     await initCoaches()
