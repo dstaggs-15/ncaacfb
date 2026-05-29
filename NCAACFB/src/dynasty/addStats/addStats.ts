@@ -75,6 +75,23 @@ export default async function initAddStatsPage() {
     const seasonOptions = await getSeasonOptions('')
 
     formArea.innerHTML = `
+        <div class="csv-upload-section">
+          <div class="csv-upload-actions">
+            <a id="download-template-btn" class="csv-action-button" href="/game_results_template.csv" download>
+              ↓ Download Template
+            </a>
+            <label class="csv-action-button csv-file-label" for="csv-file-input">
+              ↑ Upload CSV
+            </label>
+            <input id="csv-file-input" type="file" accept=".csv" style="display:none" />
+          </div>
+          <div id="csv-progress" class="csv-progress" style="display:none">
+            <div class="csv-progress-bar">
+              <div id="csv-progress-fill" class="csv-progress-fill" style="width:0%"></div>
+            </div>
+            <p id="csv-progress-text" class="csv-progress-text">Processing...</p>
+          </div>
+        </div>
         <form id="game-form" class="add-stats-form">
             <label>
             Dynasty
@@ -197,6 +214,100 @@ export default async function initAddStatsPage() {
 
         setStatus('Game submitted.', 'success')
         clearGameFields()
+    })
+
+    document.querySelector<HTMLInputElement>('#csv-file-input')?.addEventListener('change', async (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0]
+      if (!file) return
+
+      const text = await file.text()
+      const rows = parseCSV(text)
+
+      if (rows.length === 0) {
+        setStatus('No data rows found in CSV.', 'error')
+        return
+      }
+
+      const progressEl = document.querySelector<HTMLDivElement>('#csv-progress')
+      const progressFill = document.querySelector<HTMLDivElement>('#csv-progress-fill')
+      const progressText = document.querySelector<HTMLParagraphElement>('#csv-progress-text')
+
+      if (progressEl) progressEl.style.display = 'block'
+
+      let succeeded = 0
+      let failed = 0
+      const errors: string[] = []
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i]
+        if (progressFill) progressFill.style.width = `${Math.round((i / rows.length) * 100)}%`
+        if (progressText) progressText.textContent = `Processing row ${i + 1} of ${rows.length}…`
+
+        const dynastyName = row['dynasty_name'] ?? ''
+        const seasonYear = row['season_year'] ?? ''
+        const homeTeam = row['home_team'] ?? ''
+        const awayTeam = row['away_team'] ?? ''
+        const homeScore = row['home_score'] ?? ''
+        const awayScore = row['away_score'] ?? ''
+        const gameType = row['game_type'] ?? 'regular_season'
+        const weekStr = row['week'] ?? ''
+
+        const dynasty = dynasties.find(d => d.name.toLowerCase() === dynastyName.toLowerCase())
+        if (!dynasty) {
+          failed++
+          errors.push(`Row ${i + 1}: Dynasty "${dynastyName}" not found`)
+          continue
+        }
+
+        const { data: seasonData, error: seasonError } = await supabase
+          .from('seasons')
+          .select('id')
+          .eq('dynasty_id', dynasty.id)
+          .eq('year', Number(seasonYear))
+          .single()
+
+        if (seasonError || !seasonData) {
+          failed++
+          errors.push(`Row ${i + 1}: Season ${seasonYear} not found for "${dynastyName}"`)
+          continue
+        }
+
+        const isRivalry = gameType === 'rivalry'
+        const isPlayoff = gameType === 'playoff' || gameType === 'bowl' || gameType === 'national_championship'
+        const isConferenceChampionship = gameType === 'conference_championship'
+        const weekValue = weekStr === '' ? null : Number(weekStr)
+
+        const { error: insertError } = await supabase.from('games').insert({
+          dynasty_id: dynasty.id,
+          season_id: seasonData.id,
+          home_team: homeTeam,
+          away_team: awayTeam,
+          home_score: homeScore === '' ? null : Number(homeScore),
+          away_score: awayScore === '' ? null : Number(awayScore),
+          week: weekValue,
+          is_rivalry: isRivalry,
+          is_playoff: isPlayoff,
+          is_conference_championship: isConferenceChampionship,
+          notes: null
+        })
+
+        if (insertError) {
+          failed++
+          errors.push(`Row ${i + 1}: ${insertError.message}`)
+        } else {
+          succeeded++
+        }
+      }
+
+      if (progressFill) progressFill.style.width = '100%'
+      if (progressText) progressText.textContent = 'Done'
+
+      const type = failed === 0 ? 'success' : succeeded > 0 ? 'neutral' : 'error'
+      const summary = `${succeeded} game${succeeded !== 1 ? 's' : ''} added${failed > 0 ? `, ${failed} failed` : ''}.`
+      setStatus(summary + (errors.length > 0 ? ' (See console for row details.)' : ''), type)
+
+      if (errors.length > 0) console.warn('CSV upload errors:', errors)
+      ;(event.target as HTMLInputElement).value = ''
     })
   }
 
@@ -529,4 +640,44 @@ function setTextAreaValue(selector: string, value: string) {
     if (textArea) {
         textArea.value = value
     }
+}
+
+function parseCSV(text: string): Record<string, string>[] {
+  const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().split('\n').filter(Boolean)
+  if (lines.length < 2) return []
+
+  const headers = lines[0].split(',').map(h => h.trim())
+  const rows: Record<string, string>[] = []
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = splitCSVLine(lines[i])
+    if (values.every(v => v.trim() === '')) continue
+    const row: Record<string, string> = {}
+    headers.forEach((header, idx) => {
+      row[header] = (values[idx] ?? '').trim()
+    })
+    rows.push(row)
+  }
+
+  return rows
+}
+
+function splitCSVLine(line: string): string[] {
+  const result: string[] = []
+  let current = ''
+  let inQuotes = false
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i]
+    if (char === '"') {
+      inQuotes = !inQuotes
+    } else if (char === ',' && !inQuotes) {
+      result.push(current)
+      current = ''
+    } else {
+      current += char
+    }
+  }
+  result.push(current)
+  return result
 }

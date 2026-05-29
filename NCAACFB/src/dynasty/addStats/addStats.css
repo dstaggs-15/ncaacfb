@@ -241,6 +241,67 @@
   }
 }
 
+.csv-upload-section {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.csv-upload-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.csv-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid rgba(212, 160, 23, 0.5);
+  border-radius: 10px;
+  background: transparent;
+  color: #D4A017;
+  font-size: 14px;
+  font-weight: 900;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease;
+}
+
+.csv-action-button:hover {
+  background: rgba(212, 160, 23, 0.12);
+  border-color: #D4A017;
+}
+
+.csv-progress {
+  margin-top: 14px;
+}
+
+.csv-progress-bar {
+  height: 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.csv-progress-fill {
+  height: 100%;
+  background: #D4A017;
+  border-radius: 4px;
+  transition: width 0.2s ease;
+}
+
+.csv-progress-text {
+  margin: 8px 0 0;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
 .form-check-row {
   min-height: 48px;
   padding: 12px 14px;
