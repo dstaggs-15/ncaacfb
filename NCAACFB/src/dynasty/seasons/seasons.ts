@@ -97,20 +97,15 @@ async function init() {
         });
     }
 
+    function teamNameToSlug(name: string): string {
+        return name.toLowerCase().replace(/\s+/g, "-");
+    }
+
     function getLogoHtml(teamName: string) {
-        const logo = teamLogoMap[teamName.toLowerCase()];
+        const src = teamLogoMap[teamName.toLowerCase()]
+            || `/assets/teams/logos/${teamNameToSlug(teamName)}.png`;
 
-        if (!logo) {
-            return "";
-        }
-
-        return `
-            <img
-                src="${logo}"
-                alt="${teamName} logo"
-                class="team-logo"
-            />
-        `;
+        return `<img src="${src}" alt="${teamName} logo" class="team-logo" onerror="this.style.display='none'" />`;
     }
 
     function formatGameWeek(week: number | null | undefined) {
