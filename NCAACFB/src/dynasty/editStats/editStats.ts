@@ -11,6 +11,14 @@ type Dynasty = {
 
 type RecordType = 'game'
 
+type GameType =
+    | 'regular_season'
+    | 'rivalry'
+    | 'conference_championship'
+    | 'bowl'
+    | 'playoff'
+    | 'national_championship'
+
 type GameRecord = {
     id: string
     dynasty_id: string
@@ -20,9 +28,7 @@ type GameRecord = {
     home_score: number | null
     away_score: number | null
     week: number | null
-    is_rivalry: boolean | null
-    is_playoff: boolean | null
-    is_conference_championship: boolean | null
+    game_type: GameType | null
     notes: string | null
     seasons?: {
         year: number
@@ -97,9 +103,7 @@ export default async function initEditStatsPage() {
                 home_score,
                 away_score,
                 week,
-                is_rivalry,
-                is_playoff,
-                is_conference_championship,
+                game_type,
                 notes,
                 seasons (
                     year
@@ -227,7 +231,9 @@ export default async function initEditStatsPage() {
                         <option value="regular_season" ${gameType === 'regular_season' ? 'selected' : ''}>Regular Season</option>
                         <option value="rivalry" ${gameType === 'rivalry' ? 'selected' : ''}>Rivalry Game</option>
                         <option value="conference_championship" ${gameType === 'conference_championship' ? 'selected' : ''}>Conference Championship</option>
+                        <option value="bowl" ${gameType === 'bowl' ? 'selected' : ''}>Bowl Game</option>
                         <option value="playoff" ${gameType === 'playoff' ? 'selected' : ''}>Playoff Game</option>
+                        <option value="national_championship" ${gameType === 'national_championship' ? 'selected' : ''}>National Championship</option>
                     </select>
                 </label>
 
@@ -266,16 +272,14 @@ export default async function initEditStatsPage() {
         const gameType = getSelectValue('#game-type')
         const notes = getTextAreaValue('#game-notes')
 
-        const isRivalry = gameType === 'rivalry'
-        const isPlayoff = gameType === 'playoff'
-        const isConferenceChampionship = gameType === 'conference_championship'
-
         if (!dynastyId || !seasonId || !homeTeam || !awayTeam) {
             setStatus('Please choose a season and enter both teams.', 'error')
             return
         }
 
-        const { error } = await supabase
+        setStatus('Saving changes...', 'neutral')
+
+        const { data, error } = await supabase
             .from('games')
             .update({
                 season_id: seasonId,
@@ -284,16 +288,21 @@ export default async function initEditStatsPage() {
                 home_score: homeScore,
                 away_score: awayScore,
                 week,
-                is_rivalry: isRivalry,
-                is_playoff: isPlayoff,
-                is_conference_championship: isConferenceChampionship,
+                game_type: gameType,
                 notes: notes || null
             })
             .eq('id', gameId)
             .eq('dynasty_id', dynastyId)
+            .select('id')
+            .maybeSingle()
 
         if (error) {
-            setStatus(error.message, 'error')
+            setStatus(`Could not update game: ${error.message}`, 'error')
+            return
+        }
+
+        if (!data) {
+            setStatus('No game was updated. Check the game ID, dynasty ID, and Supabase UPDATE policy.', 'error')
             return
         }
 
@@ -411,12 +420,19 @@ function formatGameWeek(week: number | null | undefined) {
     return `Week ${week}`
 }
 
-function getGameType(game: GameRecord) {
-    if (game.is_conference_championship) return 'conference_championship'
-    if (game.is_playoff) return 'playoff'
-    if (game.is_rivalry) return 'rivalry'
+function getGameType(game: GameRecord): GameType {
+    const validGameTypes: GameType[] = [
+        'regular_season',
+        'rivalry',
+        'conference_championship',
+        'playoff',
+        'bowl',
+        'national_championship'
+    ]
 
-    return 'regular_season'
+    return game.game_type && validGameTypes.includes(game.game_type)
+        ? game.game_type
+        : 'regular_season'
 }
 
 function getRequiredElement<T extends HTMLElement>(selector: string) {
