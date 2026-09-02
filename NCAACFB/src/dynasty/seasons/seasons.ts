@@ -94,7 +94,6 @@ async function init() {
 
     dynastyNameEl.textContent = activeDynasty.name;
 
-    // Get seasons
     const { data: seasons, error: seasonsError } = await supabase
         .from("seasons")
         .select("*")
@@ -112,7 +111,6 @@ async function init() {
         return;
     }
 
-    // Get games
     const { data: games, error: gamesError } = await supabase
         .from("games")
         .select("*")
@@ -129,7 +127,6 @@ async function init() {
         return;
     }
 
-    // Get who controls each team for each season
     const { data: teamControls, error: controlsError } = await supabase
         .from("season_team_control")
         .select(`
@@ -152,7 +149,6 @@ async function init() {
 
     const controls = (teamControls ?? []) as TeamControl[];
 
-    // Get team logos
     const { data: teams, error: teamsError } = await supabase
         .from("teams")
         .select("*")
@@ -193,7 +189,7 @@ async function init() {
 
     function getGameType(game: Game): string {
         if (game.game_type) {
-            return game.game_type;
+            return game.game_type.toLowerCase();
         }
 
         if (game.is_conference_championship) {
@@ -208,21 +204,21 @@ async function init() {
             return "rivalry";
         }
 
-        return "regular";
+        return "regular_season";
     }
 
     function getGameTypeLabel(game: Game): string {
         const type = getGameType(game);
 
-        if (type === "conference_championship") {
+        if (type === "conference_championship" || type === "conference championship") {
             return "🏆 Conference Championship";
         }
 
-        if (type === "national_championship") {
+        if (type === "national_championship" || type === "national championship") {
             return "🏆 National Championship";
         }
 
-        if (type === "bowl") {
+        if (type === "bowl" || type === "bowl game") {
             return "🏆 Bowl Game";
         }
 
@@ -248,15 +244,15 @@ async function init() {
 
         const type = getGameType(game);
 
-        if (type === "conference_championship") {
+        if (type === "conference_championship" || type === "conference championship") {
             return "Conference Championship";
         }
 
-        if (type === "national_championship") {
+        if (type === "national_championship" || type === "national championship") {
             return "National Championship";
         }
 
-        if (type === "bowl") {
+        if (type === "bowl" || type === "bowl game") {
             return "Bowl Game";
         }
 
@@ -278,20 +274,20 @@ async function init() {
 
         const type = getGameType(game);
 
-        if (type === "conference_championship") {
-            return 14;
+        if (type === "conference_championship" || type === "conference championship") {
+            return 17;
         }
 
         if (type === "playoff") {
-            return 15;
+            return 20;
         }
 
-        if (type === "bowl") {
-            return 16;
+        if (type === "bowl" || type === "bowl game") {
+            return 18;
         }
 
-        if (type === "national_championship") {
-            return 99;
+        if (type === "national_championship" || type === "national championship") {
+            return 30;
         }
 
         return 100;
@@ -374,6 +370,211 @@ async function init() {
             });
     }
 
+    function isPostseasonGame(game: Game): boolean {
+        const type = getGameType(game);
+
+        return (
+            type === "conference_championship" ||
+            type === "conference championship" ||
+            type === "bowl" ||
+            type === "bowl game" ||
+            type === "playoff" ||
+            type === "national_championship" ||
+            type === "national championship"
+        );
+    }
+
+    function getTeamRecord(
+        teamName: string,
+        seasonGames: Game[]
+    ): { wins: number; losses: number } {
+        let wins = 0;
+        let losses = 0;
+
+        for (const game of seasonGames) {
+            if (
+                game.home_score === null ||
+                game.away_score === null
+            ) {
+                continue;
+            }
+
+            const isHome =
+                game.home_team.toLowerCase() ===
+                teamName.toLowerCase();
+
+            const isAway =
+                game.away_team.toLowerCase() ===
+                teamName.toLowerCase();
+
+            if (!isHome && !isAway) {
+                continue;
+            }
+
+            const teamScore = isHome
+                ? game.home_score
+                : game.away_score;
+
+            const opponentScore = isHome
+                ? game.away_score
+                : game.home_score;
+
+            if (teamScore > opponentScore) {
+                wins++;
+            } else if (teamScore < opponentScore) {
+                losses++;
+            }
+        }
+
+        return { wins, losses };
+    }
+
+    function getPostseasonResult(
+        teamName: string,
+        seasonGames: Game[]
+    ): {
+        madePostseason: boolean;
+        label: string;
+    } {
+        const postseasonGames = seasonGames
+            .filter(
+                (game) =>
+                    isPostseasonGame(game) &&
+                    (
+                        game.home_team.toLowerCase() === teamName.toLowerCase() ||
+                        game.away_team.toLowerCase() === teamName.toLowerCase()
+                    )
+            )
+            .sort(
+                (a, b) =>
+                    getGameSortValue(a) -
+                    getGameSortValue(b)
+            );
+
+        if (postseasonGames.length === 0) {
+            return {
+                madePostseason: false,
+                label: "No Postseason",
+            };
+        }
+
+        const wonNationalChampionship = postseasonGames.some(
+            (game) =>
+                (
+                    game.game_type ?? ""
+                ).toLowerCase().replace(/[_-]/g, " ") ===
+                    "national championship" &&
+                getTeamWonGame(teamName, game)
+        );
+
+        if (wonNationalChampionship) {
+            return {
+                madePostseason: true,
+                label: "National Champion",
+            };
+        }
+
+        const playedNationalChampionship = postseasonGames.some(
+            (game) =>
+                (
+                    game.game_type ?? ""
+                ).toLowerCase().replace(/[_-]/g, " ") ===
+                    "national championship"
+        );
+
+        if (playedNationalChampionship) {
+            return {
+                madePostseason: true,
+                label: "National Championship Runner-Up",
+            };
+        }
+
+        const wonConferenceChampionship = postseasonGames.some(
+            (game) =>
+                (
+                    game.game_type ?? ""
+                ).toLowerCase().replace(/[_-]/g, " ") ===
+                    "conference championship" &&
+                getTeamWonGame(teamName, game)
+        );
+
+        if (wonConferenceChampionship) {
+            return {
+                madePostseason: true,
+                label: "Conference Champion",
+            };
+        }
+
+        const playedConferenceChampionship = postseasonGames.some(
+            (game) =>
+                (
+                    game.game_type ?? ""
+                ).toLowerCase().replace(/[_-]/g, " ") ===
+                    "conference championship"
+        );
+
+        if (playedConferenceChampionship) {
+            return {
+                madePostseason: true,
+                label: "Made Conference Championship",
+            };
+        }
+
+        const bowlGame = postseasonGames.find(
+            (game) => {
+                const type = (
+                    game.game_type ?? ""
+                ).toLowerCase();
+
+                return (
+                    type === "bowl" ||
+                    type === "bowl game"
+                );
+            }
+        );
+
+        if (bowlGame) {
+            if (getTeamWonGame(teamName, bowlGame)) {
+                return {
+                    madePostseason: true,
+                    label: "Bowl Winner",
+                };
+            }
+
+            return {
+                madePostseason: true,
+                label: "Made Bowl",
+            };
+        }
+
+        return {
+            madePostseason: true,
+            label: "Made Postseason",
+        };
+    }
+
+    function getTeamWonGame(
+        teamName: string,
+        game: Game
+    ): boolean {
+        if (
+            game.home_score === null ||
+            game.away_score === null
+        ) {
+            return false;
+        }
+
+        const isHome =
+            game.home_team.toLowerCase() ===
+            teamName.toLowerCase();
+
+        if (isHome) {
+            return game.home_score > game.away_score;
+        }
+
+        return game.away_score > game.home_score;
+    }
+
     function renderGameRow(
         seasonId: string,
         game: Game
@@ -430,6 +631,16 @@ async function init() {
             return "";
         }
 
+        const record = getTeamRecord(
+            teamName,
+            seasonGames
+        );
+
+        const postseason = getPostseasonResult(
+            teamName,
+            seasonGames
+        );
+
         return `
             <div class="season-user-section">
 
@@ -437,6 +648,21 @@ async function init() {
                     <h3>
                         ${escapeHtml(userName)} — ${escapeHtml(teamName)}
                     </h3>
+
+                    <div class="season-user-summary">
+                        <strong>${record.wins}-${record.losses}</strong>
+                        <span class="season-postseason-status ${
+                            postseason.madePostseason
+                                ? "made-postseason"
+                                : "no-postseason"
+                        }">
+                            ${
+                                postseason.madePostseason
+                                    ? `🏆 ${escapeHtml(postseason.label)}`
+                                    : escapeHtml(postseason.label)
+                            }
+                        </span>
+                    </div>
                 </div>
 
                 <table class="season-history-table">
@@ -539,9 +765,7 @@ async function init() {
             seasonGames
         );
 
-        if (
-            seasonGames.length === 0
-        ) {
+        if (seasonGames.length === 0) {
             return `
                 <section class="season-history-season">
                     <div class="season-history-season-heading">
