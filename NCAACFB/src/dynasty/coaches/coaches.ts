@@ -58,21 +58,26 @@ type CoachSeason = {
   conferenceLosses: number;
 };
 
-type CoachRecord = {
-  profileId: string;
-  coachName: string;
-  seasons: CoachSeason[];
-  wins: number;
-  losses: number;
-  conferenceWins: number;
-  conferenceLosses: number;
-};
-
 type H2HRecord = {
   opponentProfileId: string;
   opponentName: string;
   wins: number;
   losses: number;
+};
+
+type CoachRecord = {
+  profileId: string;
+  coachName: string;
+
+  seasons: CoachSeason[];
+
+  wins: number;
+  losses: number;
+
+  conferenceWins: number;
+  conferenceLosses: number;
+
+  h2h: H2HRecord[];
 };
 
 let currentCoaches: CoachRecord[] = [];
@@ -105,6 +110,14 @@ async function init() {
     return;
   }
 
+  /*
+   * The existing HTML does not need to be changed.
+   *
+   * We create the H2H section dynamically underneath
+   * the existing records table.
+   */
+  const h2hContainer = createH2HContainer(recordsTableBody);
+
   const dynasties = (await getAllDynasties()) as Dynasty[];
 
   renderDynastyOptions(dynastySelect, dynasties);
@@ -115,7 +128,11 @@ async function init() {
     selectedCoachIds.clear();
     currentCoaches = [];
 
-    renderNoSelectedCoaches(recordsTableBody, selectedCoachSummary);
+    renderNoSelectedCoaches(
+      recordsTableBody,
+      selectedCoachSummary,
+      h2hContainer
+    );
 
     if (!dynastyId) {
       renderCoachIdle(coachListBody);
@@ -153,7 +170,8 @@ async function init() {
 
     renderSelectedCoaches(
       recordsTableBody,
-      selectedCoachSummary
+      selectedCoachSummary,
+      h2hContainer
     );
   });
 }
@@ -164,7 +182,7 @@ function renderDynastyOptions(
 ) {
   const optionsHtml = dynasties
     .map((dynasty) => {
-      return `<option value="${dynasty.id}">${escapeHtml(
+      return `<option value="${escapeHtml(dynasty.id)}">${escapeHtml(
         dynasty.name
       )}</option>`;
     })
@@ -198,8 +216,10 @@ async function loadCoachesForDynasty(
      * season_team_control
      * games
      *
-     * We intentionally do NOT rely on the old coaches table for
-     * wins/losses because users can change teams between seasons.
+     * We intentionally do NOT rely on the old coaches table.
+     *
+     * Users can change teams between seasons, so the
+     * season_team_control table is the source of truth.
      */
 
     const [
@@ -226,7 +246,9 @@ async function loadCoachesForDynasty(
 
       supabase
         .from("season_team_control")
-        .select("season_id, team_id, profile_id, control_type"),
+        .select(
+          "season_id, team_id, profile_id, control_type"
+        ),
 
       supabase
         .from("games")
@@ -269,7 +291,8 @@ async function loadCoachesForDynasty(
     const seasons = (seasonsResult.data ?? []) as Season[];
     const teams = (teamsResult.data ?? []) as Team[];
     const profiles = (profilesResult.data ?? []) as Profile[];
-    const controls = (controlResult.data ?? []) as SeasonTeamControl[];
+    const controls =
+      (controlResult.data ?? []) as SeasonTeamControl[];
     const games = (gamesResult.data ?? []) as Game[];
 
     currentCoaches = calculateCoachRecords(
@@ -306,15 +329,10 @@ function calculateCoachRecords(
   games: Game[]
 ): CoachRecord[] {
   const profileMap = new Map<string, Profile>();
-  const teamMap = new Map<string, Team>();
   const seasonMap = new Map<string, Season>();
 
   for (const profile of profiles) {
     profileMap.set(profile.id, profile);
-  }
-
-  for (const team of teams) {
-    teamMap.set(team.id, team);
   }
 
   for (const season of seasons) {
@@ -322,17 +340,15 @@ function calculateCoachRecords(
   }
 
   /*
-   * Maps:
-   *
    * season ID + team ID -> human profile
    *
-   * This is what allows:
+   * Example:
    *
-   * 2026 Daniel = California
-   * 2027 Daniel = Vanderbilt
-   * 2028 Daniel = Texas
+   * 2026 California -> Daniel
+   * 2027 Vanderbilt -> Daniel
+   * 2028 Texas -> Daniel
    *
-   * without permanently assigning Daniel to one team.
+   * This lets coaches change teams between seasons.
    */
   const controlMap = new Map<string, string>();
 
@@ -355,8 +371,7 @@ function calculateCoachRecords(
   const coachMap = new Map<string, CoachRecord>();
 
   /*
-   * Process every game and determine which human coach,
-   * if any, controlled each side.
+   * Process every game.
    */
   for (const game of games) {
     if (
@@ -401,15 +416,19 @@ function calculateCoachRecords(
     );
 
     /*
-     * If neither side is controlled by a human,
-     * this game doesn't affect coach records.
+     * CPU vs CPU:
+     * Nothing to record.
      */
     if (!homeProfileId && !awayProfileId) {
       continue;
     }
 
+    const conferenceGame = isConferenceGame(game);
+
     /*
-     * User vs User
+     * USER VS USER
+     *
+     * This is also what creates the H2H records.
      */
     if (homeProfileId && awayProfileId) {
       const homeWon =
@@ -424,7 +443,7 @@ function calculateCoachRecords(
         season.year,
         homeTeam.name,
         homeWon,
-        isConferenceGame(game),
+        conferenceGame,
         awayProfileId,
         profileMap
       );
@@ -435,7 +454,7 @@ function calculateCoachRecords(
         season.year,
         awayTeam.name,
         awayWon,
-        isConferenceGame(game),
+        conferenceGame,
         homeProfileId,
         profileMap
       );
@@ -444,7 +463,7 @@ function calculateCoachRecords(
     }
 
     /*
-     * User vs CPU
+     * USER VS CPU
      */
     if (homeProfileId) {
       updateCoachGame(
@@ -453,7 +472,7 @@ function calculateCoachRecords(
         season.year,
         homeTeam.name,
         game.home_score > game.away_score,
-        isConferenceGame(game),
+        conferenceGame,
         null,
         profileMap
       );
@@ -466,11 +485,24 @@ function calculateCoachRecords(
         season.year,
         awayTeam.name,
         game.away_score > game.home_score,
-        isConferenceGame(game),
+        conferenceGame,
         null,
         profileMap
       );
     }
+  }
+
+  /*
+   * Sort each coach's seasons chronologically.
+   */
+  for (const coach of coachMap.values()) {
+    coach.seasons.sort(
+      (a, b) => a.seasonYear - b.seasonYear
+    );
+
+    coach.h2h.sort((a, b) =>
+      a.opponentName.localeCompare(b.opponentName)
+    );
   }
 
   return Array.from(coachMap.values()).sort((a, b) => {
@@ -514,11 +546,15 @@ function updateCoachGame(
       losses: 0,
       conferenceWins: 0,
       conferenceLosses: 0,
+      h2h: [],
     };
 
     coachMap.set(profileId, coach);
   }
 
+  /*
+   * Overall all-time record.
+   */
   if (won) {
     coach.wins++;
 
@@ -533,6 +569,9 @@ function updateCoachGame(
     }
   }
 
+  /*
+   * Season record.
+   */
   let seasonRecord = coach.seasons.find(
     (season) =>
       season.seasonYear === seasonYear &&
@@ -563,6 +602,44 @@ function updateCoachGame(
 
     if (conferenceGame) {
       seasonRecord.conferenceLosses++;
+    }
+  }
+
+  /*
+   * Head-to-head record.
+   *
+   * Only created when both sides are human-controlled.
+   */
+  if (opponentProfileId) {
+    const opponentProfile =
+      profileMap.get(opponentProfileId);
+
+    const opponentName =
+      opponentProfile?.display_name ||
+      opponentProfile?.username ||
+      "Unknown";
+
+    let h2h = coach.h2h.find(
+      (record) =>
+        record.opponentProfileId ===
+        opponentProfileId
+    );
+
+    if (!h2h) {
+      h2h = {
+        opponentProfileId,
+        opponentName,
+        wins: 0,
+        losses: 0,
+      };
+
+      coach.h2h.push(h2h);
+    }
+
+    if (won) {
+      h2h.wins++;
+    } else {
+      h2h.losses++;
     }
   }
 }
@@ -633,7 +710,8 @@ function renderCoachList(
 
 function renderNoSelectedCoaches(
   recordsTableBody: HTMLTableSectionElement,
-  selectedCoachSummary: HTMLParagraphElement
+  selectedCoachSummary: HTMLParagraphElement,
+  h2hContainer: HTMLDivElement
 ) {
   selectedCoachSummary.textContent =
     "Choose one or more coaches to view their records.";
@@ -645,11 +723,14 @@ function renderNoSelectedCoaches(
       </td>
     </tr>
   `;
+
+  h2hContainer.innerHTML = "";
 }
 
 function renderSelectedCoaches(
   recordsTableBody: HTMLTableSectionElement,
-  selectedCoachSummary: HTMLParagraphElement
+  selectedCoachSummary: HTMLParagraphElement,
+  h2hContainer: HTMLDivElement
 ) {
   const selectedCoaches = currentCoaches.filter(
     (coach) =>
@@ -659,7 +740,8 @@ function renderSelectedCoaches(
   if (selectedCoaches.length === 0) {
     renderNoSelectedCoaches(
       recordsTableBody,
-      selectedCoachSummary
+      selectedCoachSummary,
+      h2hContainer
     );
 
     return;
@@ -670,13 +752,36 @@ function renderSelectedCoaches(
       ? "1 coach selected."
       : `${selectedCoaches.length} coaches selected.`;
 
+  /*
+   * ALL-TIME ROW
+   *
+   * This appears before the individual seasons.
+   */
   recordsTableBody.innerHTML = selectedCoaches
     .map((coach) => {
+      const allTimeRow = `
+        <tr class="coaches-all-time-row">
+          <td class="coaches-name">
+            ${escapeHtml(coach.coachName)}
+          </td>
+
+          <td class="coaches-team">
+            <strong>ALL-TIME</strong>
+          </td>
+
+          <td class="coaches-record">
+            <strong>${coach.wins}-${coach.losses}</strong>
+          </td>
+
+          <td class="coaches-conference-record">
+            <strong>
+              ${coach.conferenceWins}-${coach.conferenceLosses}
+            </strong>
+          </td>
+        </tr>
+      `;
+
       const seasonRows = coach.seasons
-        .sort(
-          (a, b) =>
-            a.seasonYear - b.seasonYear
-        )
         .map(
           (season) => `
             <tr>
@@ -702,16 +807,184 @@ function renderSelectedCoaches(
         )
         .join("");
 
-      return seasonRows;
+      return allTimeRow + seasonRows;
     })
     .join("");
+
+  renderH2H(
+    h2hContainer,
+    selectedCoaches
+  );
+}
+
+function createH2HContainer(
+  recordsTableBody: HTMLTableSectionElement
+): HTMLDivElement {
+  const existing =
+    document.querySelector<HTMLDivElement>(
+      "#coaches-h2h-container"
+    );
+
+  if (existing) {
+    return existing;
+  }
+
+  const container =
+    document.createElement("div");
+
+  container.id = "coaches-h2h-container";
+  container.className = "coaches-h2h-container";
+
+  const table = recordsTableBody.closest("table");
+
+  if (table) {
+    table.insertAdjacentElement(
+      "afterend",
+      container
+    );
+  } else {
+    recordsTableBody.parentElement?.appendChild(
+      container
+    );
+  }
+
+  return container;
+}
+
+function renderH2H(
+  container: HTMLDivElement,
+  selectedCoaches: CoachRecord[]
+) {
+  /*
+   * H2H requires at least two selected coaches.
+   */
+  if (selectedCoaches.length < 2) {
+    container.innerHTML = `
+      <div class="coaches-h2h">
+        <h3>Head-to-Head</h3>
+
+        <p class="coaches-empty-row">
+          Select at least two coaches to view all-time head-to-head records.
+        </p>
+      </div>
+    `;
+
+    return;
+  }
+
+  /*
+   * Build every unique pairing.
+   *
+   * If we select:
+   *
+   * Tucker
+   * Daniel
+   * Cam
+   *
+   * we get:
+   *
+   * Tucker vs Daniel
+   * Tucker vs Cam
+   * Daniel vs Cam
+   *
+   * We only display each matchup once.
+   */
+  const pairings: Array<{
+    coach: CoachRecord;
+    opponent: CoachRecord;
+    wins: number;
+    losses: number;
+  }> = [];
+
+  for (
+    let i = 0;
+    i < selectedCoaches.length;
+    i++
+  ) {
+    for (
+      let j = i + 1;
+      j < selectedCoaches.length;
+      j++
+    ) {
+      const coach = selectedCoaches[i];
+      const opponent = selectedCoaches[j];
+
+      const record = coach.h2h.find(
+        (h2h) =>
+          h2h.opponentProfileId ===
+          opponent.profileId
+      );
+
+      pairings.push({
+        coach,
+        opponent,
+        wins: record?.wins ?? 0,
+        losses: record?.losses ?? 0,
+      });
+    }
+  }
+
+  container.innerHTML = `
+    <div class="coaches-h2h">
+      <h3>Head-to-Head — All-Time</h3>
+
+      ${
+        pairings.length === 0
+          ? `
+            <p class="coaches-empty-row">
+              No head-to-head games have been played between the selected coaches.
+            </p>
+          `
+          : `
+            <div class="coaches-h2h-table-wrapper">
+              <table class="coaches-h2h-table">
+                <thead>
+                  <tr>
+                    <th>Coach</th>
+                    <th>Opponent</th>
+                    <th>Record</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  ${pairings
+                    .map(
+                      (pairing) => `
+                        <tr>
+                          <td class="coaches-name">
+                            ${escapeHtml(
+                              pairing.coach.coachName
+                            )}
+                          </td>
+
+                          <td class="coaches-team">
+                            ${escapeHtml(
+                              pairing.opponent.coachName
+                            )}
+                          </td>
+
+                          <td class="coaches-record">
+                            ${pairing.wins}-${pairing.losses}
+                          </td>
+                        </tr>
+                      `
+                    )
+                    .join("")}
+                </tbody>
+              </table>
+            </div>
+          `
+      }
+    </div>
+  `;
 }
 
 function findTeamByName(
   teams: Team[],
   name: string
 ): Team | null {
-  const normalizedName = normalizeTeamName(name);
+  const normalizedName =
+    normalizeTeamName(name);
 
   return (
     teams.find(
@@ -742,17 +1015,18 @@ function isConferenceGame(
   game: Game
 ): boolean {
   const type =
-    (game.game_type ?? "").trim().toLowerCase();
+    (game.game_type ?? "")
+      .trim()
+      .toLowerCase();
 
   /*
-   * Conference championship is a conference game.
+   * Conference Championship counts as a
+   * conference game.
    *
-   * Regular-season games are assumed to be
-   * conference games only when the importer explicitly
-   * marks them as such in the future.
-   *
-   * For now, this correctly recognizes the explicit
-   * Conference Championship game type.
+   * Regular-season conference games are not
+   * currently distinguishable from non-conference
+   * games because the games table does not have a
+   * conference-game flag.
    */
   return (
     type === "conference_championship" ||
