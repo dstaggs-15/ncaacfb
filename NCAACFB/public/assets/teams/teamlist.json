@@ -1,0 +1,538 @@
+[
+    {
+        "name": "Air Force",
+        "logo": "air-force.png"
+    },
+    {
+        "name": "Akron",
+        "logo": "akron.png"
+    },
+    {
+        "name": "Alabama",
+        "logo": "alabama.png"
+    },
+    {
+        "name": "Appalachian State",
+        "logo": "appalachian-state.png"
+    },
+    {
+        "name": "Arizona State",
+        "logo": "arizona-state.png"
+    },
+    {
+        "name": "Arizona",
+        "logo": "arizona.png"
+    },
+    {
+        "name": "Arkansas State",
+        "logo": "arkansas-state.png"
+    },
+    {
+        "name": "Arkansas",
+        "logo": "arkansas.png"
+    },
+    {
+        "name": "Army",
+        "logo": "army.png"
+    },
+    {
+        "name": "Auburn",
+        "logo": "auburn.png"
+    },
+    {
+        "name": "Baylor",
+        "logo": "baylor.png"
+    },
+    {
+        "name": "Boise State",
+        "logo": "boise-state.png"
+    },
+    {
+        "name": "Boston College",
+        "logo": "boston-college.png"
+    },
+    {
+        "name": "Bowling Green",
+        "logo": "bowling-green.png"
+    },
+    {
+        "name": "Buffalo",
+        "logo": "buffalo.png"
+    },
+    {
+        "name": "BYU",
+        "logo": "byu.png"
+    },
+    {
+        "name": "Cal",
+        "logo": "cal.png"
+    },
+    {
+        "name": "Central Michigan",
+        "logo": "central-michigan.png"
+    },
+    {
+        "name": "Charlotte",
+        "logo": "charlotte.png"
+    },
+    {
+        "name": "Cincinnati",
+        "logo": "cincinnati.png"
+    },
+    {
+        "name": "Clemson",
+        "logo": "clemson.png"
+    },
+    {
+        "name": "Coastal Carolina",
+        "logo": "coastal-carolina.png"
+    },
+    {
+        "name": "Colorado State",
+        "logo": "colorado-state.png"
+    },
+    {
+        "name": "Colorado",
+        "logo": "colorado.png"
+    },
+    {
+        "name": "Delaware",
+        "logo": "delaware.png"
+    },
+    {
+        "name": "Duke",
+        "logo": "duke.png"
+    },
+    {
+        "name": "Eastern Michigan",
+        "logo": "eastern-michigan.png"
+    },
+    {
+        "name": "ECU",
+        "logo": "ecu.png"
+    },
+    {
+        "name": "FAU",
+        "logo": "fau.png"
+    },
+    {
+        "name": "FIU",
+        "logo": "fiu.png"
+    },
+    {
+        "name": "Florida",
+        "logo": "florida.png"
+    },
+    {
+        "name": "Fresno State",
+        "logo": "fresno-state.png"
+    },
+    {
+        "name": "FSU",
+        "logo": "fsu.png"
+    },
+    {
+        "name": "Georgia Southern",
+        "logo": "georgia-southern.png"
+    },
+    {
+        "name": "Georgia State",
+        "logo": "georgia-state.png"
+    },
+    {
+        "name": "Georgia",
+        "logo": "georgia.png"
+    },
+    {
+        "name": "Georgia Tech",
+        "logo": "gt.png"
+    },
+    {
+        "name": "Hawaii",
+        "logo": "hawaii.png"
+    },
+    {
+        "name": "Houston",
+        "logo": "houston.png"
+    },
+    {
+        "name": "Illinois",
+        "logo": "illinois.png"
+    },
+    {
+        "name": "Indiana",
+        "logo": "indiana.png"
+    },
+    {
+        "name": "Iowa State",
+        "logo": "iowa-state.png"
+    },
+    {
+        "name": "Iowa",
+        "logo": "iowa.png"
+    },
+    {
+        "name": "Jacksonville State",
+        "logo": "jacksonville-state.png"
+    },
+    {
+        "name": "JMU",
+        "logo": "jmu.png"
+    },
+    {
+        "name": "Kansas State",
+        "logo": "kansas-state.png"
+    },
+    {
+        "name": "Kansas",
+        "logo": "kansas.png"
+    },
+    {
+        "name": "Kennesaw State",
+        "logo": "kennesaw-state.png"
+    },
+    {
+        "name": "Kent State",
+        "logo": "kent-state.png"
+    },
+    {
+        "name": "Kentucky",
+        "logo": "kentucky.png"
+    },
+    {
+        "name": "Liberty",
+        "logo": "liberty.png"
+    },
+    {
+        "name": "Louisiana Ragin' Cajuns",
+        "logo": "louisiana-ragin-cajuns.png"
+    },
+    {
+        "name": "Louisiana Tech",
+        "logo": "louisiana-tech.png"
+    },
+    {
+        "name": "Louisville",
+        "logo": "louisville.png"
+    },
+    {
+        "name": "LSU",
+        "logo": "lsu.png"
+    },
+    {
+        "name": "Marshall",
+        "logo": "marshall.png"
+    },
+    {
+        "name": "Maryland",
+        "logo": "maryland.png"
+    },
+    {
+        "name": "Memphis",
+        "logo": "memphis.png"
+    },
+    {
+        "name": "Miami (OH)",
+        "logo": "miami-oh.png"
+    },
+    {
+        "name": "Miami",
+        "logo": "miami.png"
+    },
+    {
+        "name": "Michigan State",
+        "logo": "michigan-state.png"
+    },
+    {
+        "name": "Michigan",
+        "logo": "michigan.png"
+    },
+    {
+        "name": "Minnesota",
+        "logo": "minnesota.png"
+    },
+    {
+        "name": "Mississippi State",
+        "logo": "mississippi-state.png"
+    },
+    {
+        "name": "Missouri State",
+        "logo": "missouri-state.png"
+    },
+    {
+        "name": "Missouri",
+        "logo": "missouri.png"
+    },
+    {
+        "name": "Navy",
+        "logo": "navy.png"
+    },
+    {
+        "name": "NC State",
+        "logo": "nc-state.png"
+    },
+    {
+        "name": "Nebraska",
+        "logo": "nebraska.png"
+    },
+    {
+        "name": "Nevada",
+        "logo": "nevada.png"
+    },
+    {
+        "name": "New Mexico State",
+        "logo": "new-mexico-state.png"
+    },
+    {
+        "name": "New Mexico",
+        "logo": "new-mexico.png"
+    },
+    {
+        "name": "North Texas",
+        "logo": "north-texas.png"
+    },
+    {
+        "name": "Northern Illinois",
+        "logo": "northern-illinois.png"
+    },
+    {
+        "name": "Northwestern",
+        "logo": "northwestern.png"
+    },
+    {
+        "name": "Notre Dame",
+        "logo": "notre-dame.png"
+    },
+    {
+        "name": "Ohio State",
+        "logo": "ohio-state.png"
+    },
+    {
+        "name": "Ohio",
+        "logo": "ohio.png"
+    },
+    {
+        "name": "Oklahoma State",
+        "logo": "oklahoma-state.png"
+    },
+    {
+        "name": "Oklahoma",
+        "logo": "oklahoma.png"
+    },
+    {
+        "name": "Old Dominion",
+        "logo": "old-dominion.png"
+    },
+    {
+        "name": "Ole Miss",
+        "logo": "ole-miss.png"
+    },
+    {
+        "name": "Oregon State",
+        "logo": "oregon-state.png"
+    },
+    {
+        "name": "Oregon",
+        "logo": "oregon.png"
+    },
+    {
+        "name": "Penn State",
+        "logo": "penn-state.png"
+    },
+    {
+        "name": "Pittsburgh",
+        "logo": "pittsburgh.png"
+    },
+    {
+        "name": "Purdue",
+        "logo": "purdue.png"
+    },
+    {
+        "name": "Rice",
+        "logo": "rice.png"
+    },
+    {
+        "name": "Rutgers",
+        "logo": "rutger.png"
+    },
+    {
+        "name": "Sam Houston",
+        "logo": "sam-houston.png"
+    },
+    {
+        "name": "San Diego State",
+        "logo": "san-diego-state.png"
+    },
+    {
+        "name": "San Jose State",
+        "logo": "san-jose-state.png"
+    },
+    {
+        "name": "SMU",
+        "logo": "smu.png"
+    },
+    {
+        "name": "South Alabama",
+        "logo": "south-alabama.png"
+    },
+    {
+        "name": "South Carolina",
+        "logo": "south-carolina.png"
+    },
+    {
+        "name": "Southern Miss",
+        "logo": "southern-miss.png"
+    },
+    {
+        "name": "Stanford",
+        "logo": "stanford.png"
+    },
+    {
+        "name": "Syracuse",
+        "logo": "syracuse.png"
+    },
+    {
+        "name": "TCU",
+        "logo": "tcu.png"
+    },
+    {
+        "name": "Temple",
+        "logo": "temple.png"
+    },
+    {
+        "name": "Tennessee",
+        "logo": "tennessee.png"
+    },
+    {
+        "name": "Texas A&M",
+        "logo": "texas-am.png"
+    },
+    {
+        "name": "Texas State",
+        "logo": "texas-state.png"
+    },
+    {
+        "name": "Texas Tech",
+        "logo": "texas-tech.png"
+    },
+    {
+        "name": "Texas",
+        "logo": "texas.png"
+    },
+    {
+        "name": "Toledo",
+        "logo": "toledo.png"
+    },
+    {
+        "name": "Troy",
+        "logo": "troy.png"
+    },
+    {
+        "name": "Tulane",
+        "logo": "tulane.png"
+    },
+    {
+        "name": "Tulsa",
+        "logo": "tulsa.png"
+    },
+    {
+        "name": "UAB",
+        "logo": "uab.png"
+    },
+    {
+        "name": "UCF",
+        "logo": "ucf.png"
+    },
+    {
+        "name": "UCLA",
+        "logo": "ucla.png"
+    },
+    {
+        "name": "UConn",
+        "logo": "uconn.png"
+    },
+    {
+        "name": "UL Monroe",
+        "logo": "ul-monroe.png"
+    },
+    {
+        "name": "UMass",
+        "logo": "umass.png"
+    },
+    {
+        "name": "UNC",
+        "logo": "unc.png"
+    },
+    {
+        "name": "UNLV",
+        "logo": "unlv.png"
+    },
+    {
+        "name": "USC",
+        "logo": "usc.png"
+    },
+    {
+        "name": "USF",
+        "logo": "usf.png"
+    },
+    {
+        "name": "Utah State",
+        "logo": "utah-state.png"
+    },
+    {
+        "name": "Utah",
+        "logo": "utah.png"
+    },
+    {
+        "name": "UTEP",
+        "logo": "utep.png"
+    },
+    {
+        "name": "UTSA",
+        "logo": "utsa.png"
+    },
+    {
+        "name": "Vanderbilt",
+        "logo": "vanderbilt.png"
+    },
+    {
+        "name": "Virginia Tech",
+        "logo": "virginia-tech.png"
+    },
+    {
+        "name": "Virginia",
+        "logo": "virginia.png"
+    },
+    {
+        "name": "Wake Forest",
+        "logo": "wake-forest.png"
+    },
+    {
+        "name": "Washington State",
+        "logo": "washington-state.png"
+    },
+    {
+        "name": "Washington",
+        "logo": "washington.png"
+    },
+    {
+        "name": "West Virginia",
+        "logo": "west-virginia.png"
+    },
+    {
+        "name": "Western Kentucky",
+        "logo": "western-kentucky.png"
+    },
+    {
+        "name": "Western Michigan",
+        "logo": "western-michigan.png"
+    },
+    {
+        "name": "Wisconsin",
+        "logo": "wisconsin.png"
+    },
+    {
+        "name": "Wyoming",
+        "logo": "wyoming.png"
+    }
+]

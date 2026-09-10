@@ -15,9 +15,14 @@ type Profile = {
   display_name: string | null
 }
 
-type Team = {
+type DbTeam = {
   id: string
   name: string
+}
+
+type TeamListItem = {
+  name: string
+  logo: string
 }
 
 type Season = {
@@ -47,6 +52,8 @@ export default async function initAddStatsPage() {
 
   const dynasties = await getAllDynasties() as Dynasty[]
   const dynastyOptions = buildDynastyOptions(dynasties)
+  const teamList = await loadTeamList()
+  const teamOptions = buildTeamListOptions(teamList)
 
   function setStatus(message: string, type: 'success' | 'error' | 'neutral' = 'neutral') {
     statusMessage.textContent = message
@@ -128,14 +135,32 @@ export default async function initAddStatsPage() {
         <div class="form-grid">
           <label>
             Home Team
-            <input id="home-team" type="text" placeholder="USC" required />
+            <input
+              id="home-team"
+              type="text"
+              list="game-team-options"
+              placeholder="Type or select a team"
+              autocomplete="off"
+              required
+            />
           </label>
 
           <label>
             Away Team
-            <input id="away-team" type="text" placeholder="Alabama" required />
+            <input
+              id="away-team"
+              type="text"
+              list="game-team-options"
+              placeholder="Type or select a team"
+              autocomplete="off"
+              required
+            />
           </label>
         </div>
+
+        <datalist id="game-team-options">
+          ${teamOptions}
+        </datalist>
 
         <div class="form-grid">
           <label>
@@ -192,16 +217,33 @@ export default async function initAddStatsPage() {
 
       const dynastyId = getSelectValue('#game-dynasty-id')
       const seasonId = getSelectValue('#game-season-id')
-      const homeTeam = getInputValue('#home-team')
-      const awayTeam = getInputValue('#away-team')
+      const enteredHomeTeam = getInputValue('#home-team')
+      const enteredAwayTeam = getInputValue('#away-team')
+      const homeTeam = findTeamListItem(enteredHomeTeam, teamList)
+      const awayTeam = findTeamListItem(enteredAwayTeam, teamList)
       const homeScore = getNumberValue('#home-score')
       const awayScore = getNumberValue('#away-score')
       const week = getWeekValue('#week')
       const gameType = getSelectValue('#game-type')
       const notes = getTextAreaValue('#game-notes')
 
-      if (!dynastyId || !seasonId || !homeTeam || !awayTeam) {
-        setStatus('Please choose a dynasty, choose a season, and enter both teams.', 'error')
+      if (!dynastyId || !seasonId) {
+        setStatus('Please choose a dynasty and season.', 'error')
+        return
+      }
+
+      if (!homeTeam) {
+        setStatus('Please choose a valid home team from the team list.', 'error')
+        return
+      }
+
+      if (!awayTeam) {
+        setStatus('Please choose a valid away team from the team list.', 'error')
+        return
+      }
+
+      if (homeTeam.name === awayTeam.name) {
+        setStatus('The home and away teams cannot be the same.', 'error')
         return
       }
 
@@ -210,8 +252,8 @@ export default async function initAddStatsPage() {
       const { error } = await supabase.from('games').insert({
         dynasty_id: dynastyId,
         season_id: seasonId,
-        home_team: homeTeam,
-        away_team: awayTeam,
+        home_team: homeTeam.name,
+        away_team: awayTeam.name,
         home_score: homeScore,
         away_score: awayScore,
         week: gameInfo.week,
@@ -272,7 +314,7 @@ export default async function initAddStatsPage() {
        * query Supabase for the same information.
        */
       const seasonCache = new Map<string, Season>()
-      const teamCache = new Map<string, Team>()
+      const teamCache = new Map<string, DbTeam>()
       const existingGameKeys = new Set<string>()
 
       /*
@@ -364,6 +406,30 @@ export default async function initAddStatsPage() {
           continue
         }
 
+        const matchedHomeTeam = findTeamListItem(homeTeam, teamList)
+        const matchedAwayTeam = findTeamListItem(awayTeam, teamList)
+
+        if (!matchedHomeTeam) {
+          failed++
+          errors.push(`Row ${i + 1}: Home team "${homeTeam}" was not found in teamlist.json.`)
+          continue
+        }
+
+        if (!matchedAwayTeam) {
+          failed++
+          errors.push(`Row ${i + 1}: Away team "${awayTeam}" was not found in teamlist.json.`)
+          continue
+        }
+
+        if (matchedHomeTeam.name === matchedAwayTeam.name) {
+          failed++
+          errors.push(`Row ${i + 1}: Home and away teams cannot be the same.`)
+          continue
+        }
+
+        const canonicalHomeTeam = matchedHomeTeam.name
+        const canonicalAwayTeam = matchedAwayTeam.name
+
         const dynasty = dynasties.find(
           d => d.name.toLowerCase() === dynastyName.toLowerCase()
         )
@@ -412,7 +478,7 @@ export default async function initAddStatsPage() {
         /*
          * Find or create the home team.
          */
-        const homeTeamKey = `${dynasty.id}:${homeTeam.toLowerCase()}`
+        const homeTeamKey = `${dynasty.id}:${canonicalHomeTeam.toLowerCase()}`
 
         let homeTeamData = teamCache.get(homeTeamKey)
 
@@ -421,25 +487,25 @@ export default async function initAddStatsPage() {
             .from('teams')
             .select('id, name')
             .eq('dynasty_id', dynasty.id)
-            .ilike('name', homeTeam)
+            .ilike('name', canonicalHomeTeam)
             .maybeSingle()
 
           if (homeTeamError) {
             failed++
             errors.push(
-              `Row ${i + 1}: Could not find home team "${homeTeam}": ${homeTeamError.message}`
+              `Row ${i + 1}: Could not find home team "${canonicalHomeTeam}": ${homeTeamError.message}`
             )
             continue
           }
 
           if (foundHomeTeam) {
-            homeTeamData = foundHomeTeam as Team
+            homeTeamData = foundHomeTeam as DbTeam
           } else {
             const { data: newHomeTeam, error: createHomeTeamError } = await supabase
               .from('teams')
               .insert({
                 dynasty_id: dynasty.id,
-                name: homeTeam
+                name: canonicalHomeTeam
               })
               .select('id, name')
               .single()
@@ -447,12 +513,12 @@ export default async function initAddStatsPage() {
             if (createHomeTeamError || !newHomeTeam) {
               failed++
               errors.push(
-                `Row ${i + 1}: Could not create home team "${homeTeam}": ${createHomeTeamError?.message ?? 'Unknown error'}`
+                `Row ${i + 1}: Could not create home team "${canonicalHomeTeam}": ${createHomeTeamError?.message ?? 'Unknown error'}`
               )
               continue
             }
 
-            homeTeamData = newHomeTeam as Team
+            homeTeamData = newHomeTeam as DbTeam
           }
 
           teamCache.set(homeTeamKey, homeTeamData)
@@ -461,7 +527,7 @@ export default async function initAddStatsPage() {
         /*
          * Find or create the away team.
          */
-        const awayTeamKey = `${dynasty.id}:${awayTeam.toLowerCase()}`
+        const awayTeamKey = `${dynasty.id}:${canonicalAwayTeam.toLowerCase()}`
 
         let awayTeamData = teamCache.get(awayTeamKey)
 
@@ -470,25 +536,25 @@ export default async function initAddStatsPage() {
             .from('teams')
             .select('id, name')
             .eq('dynasty_id', dynasty.id)
-            .ilike('name', awayTeam)
+            .ilike('name', canonicalAwayTeam)
             .maybeSingle()
 
           if (awayTeamError) {
             failed++
             errors.push(
-              `Row ${i + 1}: Could not find away team "${awayTeam}": ${awayTeamError.message}`
+              `Row ${i + 1}: Could not find away team "${canonicalAwayTeam}": ${awayTeamError.message}`
             )
             continue
           }
 
           if (foundAwayTeam) {
-            awayTeamData = foundAwayTeam as Team
+            awayTeamData = foundAwayTeam as DbTeam
           } else {
             const { data: newAwayTeam, error: createAwayTeamError } = await supabase
               .from('teams')
               .insert({
                 dynasty_id: dynasty.id,
-                name: awayTeam
+                name: canonicalAwayTeam
               })
               .select('id, name')
               .single()
@@ -496,12 +562,12 @@ export default async function initAddStatsPage() {
             if (createAwayTeamError || !newAwayTeam) {
               failed++
               errors.push(
-                `Row ${i + 1}: Could not create away team "${awayTeam}": ${createAwayTeamError?.message ?? 'Unknown error'}`
+                `Row ${i + 1}: Could not create away team "${canonicalAwayTeam}": ${createAwayTeamError?.message ?? 'Unknown error'}`
               )
               continue
             }
 
-            awayTeamData = newAwayTeam as Team
+            awayTeamData = newAwayTeam as DbTeam
           }
 
           teamCache.set(awayTeamKey, awayTeamData)
@@ -553,7 +619,7 @@ export default async function initAddStatsPage() {
         if (homeControlError) {
           failed++
           errors.push(
-            `Row ${i + 1}: Could not assign ${homeTeam} to ${homeUser || 'CPU'}: ${homeControlError}`
+            `Row ${i + 1}: Could not assign ${canonicalHomeTeam} to ${homeUser || 'CPU'}: ${homeControlError}`
           )
           continue
         }
@@ -567,7 +633,7 @@ export default async function initAddStatsPage() {
         if (awayControlError) {
           failed++
           errors.push(
-            `Row ${i + 1}: Could not assign ${awayTeam} to ${awayUser || 'CPU'}: ${awayControlError}`
+            `Row ${i + 1}: Could not assign ${canonicalAwayTeam} to ${awayUser || 'CPU'}: ${awayControlError}`
           )
           continue
         }
@@ -606,8 +672,8 @@ export default async function initAddStatsPage() {
          */
         const gameKey = createGameKey(
           season.id,
-          homeTeam,
-          awayTeam,
+          canonicalHomeTeam,
+          canonicalAwayTeam,
           homeScore,
           awayScore,
           gameInfo.week,
@@ -623,8 +689,8 @@ export default async function initAddStatsPage() {
         const { error: insertError } = await supabase.from('games').insert({
           dynasty_id: dynasty.id,
           season_id: season.id,
-          home_team: homeTeam,
-          away_team: awayTeam,
+          home_team: canonicalHomeTeam,
+          away_team: canonicalAwayTeam,
           home_score: homeScore,
           away_score: awayScore,
           week: gameInfo.week,
@@ -762,17 +828,27 @@ export default async function initAddStatsPage() {
 
         <label>
           Team Name
-          <input id="team-name" type="text" placeholder="USC" required />
+          <input
+            id="team-name"
+            type="text"
+            list="team-management-options"
+            placeholder="Type or select a team"
+            autocomplete="off"
+            required
+          />
         </label>
+
+        <datalist id="team-management-options">
+          ${teamOptions}
+        </datalist>
+
+        <p class="form-helper">
+          Team names and logo paths are pulled from teamlist.json.
+        </p>
 
         <label>
           Conference
           <input id="team-conference" type="text" placeholder="Big Ten" />
-        </label>
-
-        <label>
-          Logo URL
-          <input id="team-logo-url" type="url" placeholder="https://example.com/logo.png" />
         </label>
 
         <button class="submit-button" type="submit">Submit Team</button>
@@ -783,20 +859,25 @@ export default async function initAddStatsPage() {
       event.preventDefault()
 
       const dynastyId = getSelectValue('#team-dynasty-id')
-      const name = getInputValue('#team-name')
+      const enteredName = getInputValue('#team-name')
+      const team = findTeamListItem(enteredName, teamList)
       const conference = getInputValue('#team-conference')
-      const logoUrl = getInputValue('#team-logo-url')
 
-      if (!dynastyId || !name) {
-        setStatus('Please choose a dynasty and enter a team name.', 'error')
+      if (!dynastyId) {
+        setStatus('Please choose a dynasty.', 'error')
+        return
+      }
+
+      if (!team) {
+        setStatus('Please choose a valid team from the team list.', 'error')
         return
       }
 
       const { error } = await supabase.from('teams').insert({
         dynasty_id: dynastyId,
-        name,
+        name: team.name,
         conference: conference || null,
-        logo_url: logoUrl || null
+        logo_url: getTeamLogoPath(team)
       })
 
       if (error) {
@@ -832,8 +913,19 @@ export default async function initAddStatsPage() {
 
         <label>
           Winning Team
-          <input id="trophy-team" type="text" placeholder="USC" required />
+          <input
+            id="trophy-team"
+            type="text"
+            list="trophy-team-options"
+            placeholder="Type or select a team"
+            autocomplete="off"
+            required
+          />
         </label>
+
+        <datalist id="trophy-team-options">
+          ${teamOptions}
+        </datalist>
 
         <label>
           Trophy Type
@@ -871,22 +963,28 @@ export default async function initAddStatsPage() {
 
       const dynastyId = getSelectValue('#trophy-dynasty-id')
       const seasonId = getSelectValue('#trophy-season-id')
-      const team = getInputValue('#trophy-team')
+      const enteredTeam = getInputValue('#trophy-team')
+      const team = findTeamListItem(enteredTeam, teamList)
       const trophyType = getSelectValue('#trophy-type')
       const trophyName = getInputValue('#trophy-name')
 
-      if (!dynastyId || !seasonId || !team || !trophyType) {
+      if (!dynastyId || !seasonId || !trophyType) {
         setStatus(
-          'Please choose a dynasty, choose a season, enter a winning team, and choose a trophy type.',
+          'Please choose a dynasty, choose a season, and choose a trophy type.',
           'error'
         )
+        return
+      }
+
+      if (!team) {
+        setStatus('Please choose a valid winning team from the team list.', 'error')
         return
       }
 
       const { error } = await supabase.from('trophies').insert({
         dynasty_id: dynastyId,
         season_id: seasonId,
-        team,
+        team: team.name,
         trophy_type: trophyType,
         trophy_name: trophyName || null
       })
@@ -913,6 +1011,73 @@ export default async function initAddStatsPage() {
   })
 
   await renderGameForm()
+}
+
+/* ============================================================
+   TEAMLIST HELPERS
+   ============================================================ */
+
+async function loadTeamList(): Promise<TeamListItem[]> {
+  try {
+    const response = await fetch('/assets/teams/teamlist.json')
+
+    if (!response.ok) {
+      throw new Error(`Could not load teamlist.json: ${response.status}`)
+    }
+
+    const teamList = await response.json() as TeamListItem[]
+
+    return teamList
+      .filter((team) => team.name && team.logo)
+      .sort((firstTeam, secondTeam) =>
+        firstTeam.name.localeCompare(secondTeam.name)
+      )
+  } catch (error) {
+    console.error('Failed to load teamlist.json:', error)
+    return []
+  }
+}
+
+function buildTeamListOptions(teamList: TeamListItem[]): string {
+  return teamList
+    .map((team) => `<option value="${escapeHtml(team.name)}"></option>`)
+    .join('')
+}
+
+function findTeamListItem(
+  value: string,
+  teamList: TeamListItem[]
+): TeamListItem | null {
+  const search = normalizeTeamName(value)
+
+  if (!search) {
+    return null
+  }
+
+  return teamList.find((team) =>
+    normalizeTeamName(team.name) === search
+  ) ?? null
+}
+
+function normalizeTeamName(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]/g, '')
+}
+
+function getTeamLogoPath(team: TeamListItem): string {
+  return `/assets/teams/logos/${team.logo}`
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
 }
 
 /* ============================================================
