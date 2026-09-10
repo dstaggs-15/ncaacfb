@@ -35,7 +35,7 @@ async function init() {
   }
 
   if (path.startsWith('/dynasty/standings')) {
-    const { default: initStandings } = await import('./dynasty/standings')
+    const { default: initStandings } = await import('./dynasty/standings/standings')
     await initStandings()
     return
   }

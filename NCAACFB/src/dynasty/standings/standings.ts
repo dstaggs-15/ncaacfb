@@ -1,6 +1,6 @@
 import "../style.css";
-import { supabase } from "../supabase";
-import { getAllDynasties } from "./dynastyData";
+import { supabase } from "../../supabase";
+import { getAllDynasties } from "../dynastyData";
 
 type Dynasty = {
   id: string;
