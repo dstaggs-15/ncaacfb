@@ -669,15 +669,17 @@ function formatGameWeek(game: GameRecord) {
 }
 
 function getGameSeasonYear(game: GameRecord): number | null {
-  if (!game.seasons) {
+  const seasons = game.seasons
+
+  if (!seasons) {
     return null
   }
 
-  if (Array.isArray(game.seasons)) {
-    return game.seasons[0]?.year ?? null
+  if (Array.isArray(seasons)) {
+    return seasons[0]?.year ?? null
   }
 
-  return game.seasons.year ?? null
+  return seasons.year ?? null
 }
 
 function groupGamesBySeason(games: GameRecord[]): Map<string, GameRecord[]> {
