@@ -1,6 +1,7 @@
 import "../style.css";
 import { supabase } from "../../supabase";
 import { getAllDynasties } from "../dynastyData";
+import "./standings.css";
 
 type Dynasty = {
   id: string;
