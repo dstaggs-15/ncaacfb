@@ -34,6 +34,8 @@ type GameRecord = {
   notes: string | null
   seasons?: {
     year: number
+  } | {
+    year: number
   }[] | null
 }
 
@@ -139,33 +141,43 @@ export default async function initEditStatsPage() {
       return
     }
 
-    recordsList.innerHTML = games
-      .map((game) => {
-        const title = `${escapeHtml(game.away_team)} at ${escapeHtml(game.home_team)}`
-        const score = formatScore(game)
-        const seasonYear = game.seasons?.[0]?.year
-        const year = seasonYear ? `${seasonYear} Season` : 'Unknown season'
-        const week = formatGameWeek(game)
+    const gamesBySeason = groupGamesBySeason(games)
 
+    recordsList.innerHTML = Array.from(gamesBySeason.entries())
+    .map(([seasonLabel, seasonGames]) => {
         return `
-          <button class="record-button" type="button" data-game-id="${game.id}">
-            <span class="record-title">${title}</span>
-            <span class="record-meta">${year} • ${week}${score}</span>
-          </button>
+        <div class="season-record-group">
+            <h3 class="season-record-heading">${escapeHtml(seasonLabel)}</h3>
+
+            ${seasonGames
+            .map((game) => {
+                const title = `${escapeHtml(game.away_team)} at ${escapeHtml(game.home_team)}`
+                const score = formatScore(game)
+                const week = formatGameWeek(game)
+
+                return `
+                <button class="record-button" type="button" data-game-id="${game.id}">
+                    <span class="record-title">${title}</span>
+                    <span class="record-meta">${week}${score}</span>
+                </button>
+                `
+            })
+            .join('')}
+        </div>
         `
-      })
-      .join('')
+    })
+    .join('')
 
     recordsList.querySelectorAll<HTMLButtonElement>('.record-button').forEach((button) => {
-      button.addEventListener('click', async () => {
+    button.addEventListener('click', async () => {
         selectedGameId = button.dataset.gameId ?? ''
 
         recordsList.querySelectorAll<HTMLButtonElement>('.record-button').forEach((recordButton) => {
-          recordButton.classList.toggle('active', recordButton.dataset.gameId === selectedGameId)
+        recordButton.classList.toggle('active', recordButton.dataset.gameId === selectedGameId)
         })
 
         await loadGameEditor(selectedGameId)
-      })
+    })
     })
 
     setStatus('Games loaded. Select one to edit.', 'neutral')
@@ -654,6 +666,47 @@ function formatGameWeek(game: GameRecord) {
   }
 
   return `Week ${game.week}`
+}
+
+function getGameSeasonYear(game: GameRecord): number | null {
+  if (!game.seasons) {
+    return null
+  }
+
+  if (Array.isArray(game.seasons)) {
+    return game.seasons[0]?.year ?? null
+  }
+
+  return game.seasons.year ?? null
+}
+
+function groupGamesBySeason(games: GameRecord[]): Map<string, GameRecord[]> {
+  const sortedGames = [...games].sort((firstGame, secondGame) => {
+    const firstYear = getGameSeasonYear(firstGame) ?? 0
+    const secondYear = getGameSeasonYear(secondGame) ?? 0
+
+    if (firstYear !== secondYear) {
+      return secondYear - firstYear
+    }
+
+    const firstWeek = firstGame.week ?? 99
+    const secondWeek = secondGame.week ?? 99
+
+    return firstWeek - secondWeek
+  })
+
+  const groups = new Map<string, GameRecord[]>()
+
+  for (const game of sortedGames) {
+    const seasonYear = getGameSeasonYear(game)
+    const seasonLabel = seasonYear ? `${seasonYear} Season` : 'Unknown Season'
+
+    const existingGames = groups.get(seasonLabel) ?? []
+    existingGames.push(game)
+    groups.set(seasonLabel, existingGames)
+  }
+
+  return groups
 }
 
 function getGameType(game: GameRecord) {

@@ -102,6 +102,27 @@
   cursor: not-allowed;
 }
 
+.season-record-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.season-record-group + .season-record-group {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.season-record-heading {
+  margin: 0 0 2px;
+  color: #D4A017;
+  font-size: 13px;
+  font-weight: 1000;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .status-message {
   min-height: 24px;
   margin: 0 0 18px;
