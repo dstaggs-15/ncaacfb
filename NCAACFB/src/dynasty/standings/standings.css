@@ -17,13 +17,9 @@
 }
 
 .standings-back-link {
-  color: #D4A017;
+  color: #d4a017;
   text-decoration: none;
   font-weight: 800;
-}
-
-.standings-back-link:hover {
-  text-decoration: underline;
 }
 
 .standings-nav-links {
@@ -38,17 +34,13 @@
   font-weight: 700;
 }
 
-.standings-nav-link:hover {
-  color: white;
-}
-
 .standings-header {
   margin-bottom: 28px;
 }
 
 .standings-eyebrow {
   margin: 0 0 8px;
-  color: #D4A017;
+  color: #d4a017;
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 0.14em;
@@ -96,17 +88,18 @@
   overflow: hidden;
   border: 1px solid rgba(212, 160, 23, 0.22);
   border-radius: 18px;
-  background: #111;
+  background: #111827;
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
 }
 
 .standings-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .standings-table thead {
-  background: #1a1a1a;
+  background: #171717;
   color: #9ca3af;
   font-size: 13px;
   text-transform: uppercase;
@@ -115,12 +108,21 @@
 .standings-table th,
 .standings-table td {
   padding: 14px 16px;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
   text-align: left;
+  vertical-align: middle;
 }
 
-.standings-table tbody tr:last-child td {
-  border-bottom: none;
+.standings-table th:nth-child(1),
+.standings-table td:nth-child(1) {
+  width: 56px;
+}
+
+.standings-table th:nth-child(3),
+.standings-table td:nth-child(3),
+.standings-table th:nth-child(4),
+.standings-table td:nth-child(4) {
+  width: 110px;
 }
 
 .standings-rank,
@@ -129,7 +131,7 @@
 }
 
 .standings-record {
-  color: #D4A017;
+  color: #d4a017;
   font-weight: 900;
 }
 
@@ -137,6 +139,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
   font-weight: 800;
 }
 
@@ -144,6 +147,8 @@
 .standings-logo-placeholder {
   width: 30px;
   height: 30px;
+  max-width: 30px;
+  max-height: 30px;
   flex: 0 0 30px;
   object-fit: contain;
 }
@@ -163,18 +168,10 @@
   color: #ef4444;
 }
 
-@media (max-width: 640px) {
-  .standings-nav {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .standings-table th,
-  .standings-table td {
-    padding: 12px 10px;
-  }
-
-  .standings-team {
-    gap: 8px;
-  }
+.standings-logo {
+  width: 30px;
+  height: 30px;
+  max-width: 30px;
+  max-height: 30px;
+  object-fit: contain;
 }

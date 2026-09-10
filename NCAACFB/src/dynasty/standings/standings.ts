@@ -1,7 +1,8 @@
+import "./standings.css";
 import "../style.css";
 import { supabase } from "../../supabase";
 import { getAllDynasties } from "../dynastyData";
-import "./standings.css";
+
 
 type Dynasty = {
   id: string;
@@ -296,7 +297,7 @@ function renderStandingRow(record: StandingRecord, index: number) {
         <div class="standings-team">
           ${
             record.logo
-              ? `<img src="${escapeHtml(record.logo)}" alt="${escapeHtml(record.team)} logo" />`
+              ? `<img class="standings-logo" src="${escapeHtml(record.logo)}" alt="${escapeHtml(record.team)} logo" />`
               : `<span class="standings-logo-placeholder"></span>`
           }
 
