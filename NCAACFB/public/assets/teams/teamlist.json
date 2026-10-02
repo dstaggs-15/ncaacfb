@@ -534,5 +534,9 @@
     {
         "name": "Wyoming",
         "logo": "wyoming.png"
+    },
+    {
+        "name": "FCS Midwest",
+        "logo": "fcs-midwest.svg"
     }
 ]

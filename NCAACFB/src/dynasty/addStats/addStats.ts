@@ -13,6 +13,7 @@ type Profile = {
   id: string
   username: string | null
   display_name: string | null
+  guest_dynasty_id?: string | null
 }
 
 type DbTeam = {
@@ -42,13 +43,16 @@ export default async function initAddStatsPage() {
 
   app.innerHTML = pageHtml
 
-  const formArea = document.querySelector<HTMLDivElement>('#form-area')
-  const statusMessage = document.querySelector<HTMLParagraphElement>('#status-message')
+  const formAreaElement = document.querySelector<HTMLDivElement>('#form-area')
+  const statusMessageElement = document.querySelector<HTMLParagraphElement>('#status-message')
 
-  if (!formArea || !statusMessage) {
+  if (!formAreaElement || !statusMessageElement) {
     console.error('Add Stats page is missing #form-area or #status-message.')
     return
   }
+
+  const formArea = formAreaElement
+  const statusMessage = statusMessageElement
 
   const dynasties = await getAllDynasties() as Dynasty[]
   const dynastyOptions = buildDynastyOptions(dynasties)
@@ -99,6 +103,8 @@ export default async function initAddStatsPage() {
 
     formArea.innerHTML = `
       <div class="csv-upload-section">
+        <p>Use a coach’s display name or email in home_user / away_user. Unknown names create a guest coach without a login account. Blank means CPU; existing user assignments are preserved.</p>
+        <pre id="csv-errors" style="white-space:pre-wrap"></pre>
         <div class="csv-upload-actions">
           <a id="download-template-btn" class="csv-action-button" href="/game_results_template.csv" download>
             ↓ Download Template
@@ -275,15 +281,41 @@ export default async function initAddStatsPage() {
       clearGameFields()
     })
 
+    let csvImportRunning = false
     document.querySelector<HTMLInputElement>('#csv-file-input')?.addEventListener('change', async (event) => {
       const file = (event.target as HTMLInputElement).files?.[0]
-      if (!file) return
-
+      if (!file || csvImportRunning) return
+      csvImportRunning = true
+      const fileInput = event.target as HTMLInputElement
+      fileInput.disabled = true
+      try {
       const text = await file.text()
       const rows = parseCSV(text)
 
       if (rows.length === 0) {
         setStatus('No data rows found in CSV.', 'error')
+        return
+      }
+
+      const validationErrors: string[] = []
+      rows.forEach((row, index) => {
+        for (const field of ['dynasty_name', 'season_year', 'home_team', 'away_team', 'game_type', 'week']) {
+          if (!cleanCSVValue(row[field])) validationErrors.push(`Row ${index + 1}: Missing ${field}.`)
+        }
+        for (const field of ['home_team', 'away_team']) {
+          if (!findTeamListItem(cleanCSVValue(row[field]), teamList)) validationErrors.push(`Row ${index + 1}: Unknown ${field} "${row[field] ?? ''}".`)
+        }
+        for (const field of ['home_score', 'away_score']) {
+          const value = cleanCSVValue(row[field])
+          if (value && !/^\d+$/.test(value)) validationErrors.push(`Row ${index + 1}: ${field} must be a nonnegative integer.`)
+        }
+        if (!/^\d{4}$/.test(cleanCSVValue(row['season_year']))) validationErrors.push(`Row ${index + 1}: Invalid season year.`)
+      })
+      const errorPanel = document.querySelector<HTMLElement>('#csv-errors')
+      if (errorPanel) errorPanel.textContent = validationErrors.join('\n')
+      if (validationErrors.length) {
+        setStatus(`CSV validation failed: ${validationErrors.length} errors. Nothing imported. See row details below.`, 'error')
+        ;(event.target as HTMLInputElement).value = ''
         return
       }
 
@@ -300,7 +332,7 @@ export default async function initAddStatsPage() {
        */
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('id, username, display_name')
+        .select('id, username, display_name, guest_dynasty_id')
 
       if (profileError) {
         setStatus(`Could not load profiles: ${profileError.message}`, 'error')
@@ -316,6 +348,7 @@ export default async function initAddStatsPage() {
       const seasonCache = new Map<string, Season>()
       const teamCache = new Map<string, DbTeam>()
       const existingGameKeys = new Set<string>()
+      const existingScores = new Map<string, string>()
 
       /*
        * Load all existing games for the dynasties in this CSV.
@@ -337,11 +370,14 @@ export default async function initAddStatsPage() {
           .eq('dynasty_id', dynasty.id)
 
         if (existingGamesError) {
-          console.warn(`Could not load existing games for ${dynasty.name}:`, existingGamesError.message)
-          continue
+          setStatus(`Could not check existing games: ${existingGamesError.message}. Nothing imported.`, 'error')
+          return
         }
 
         for (const game of existingGames ?? []) {
+          const identity = createGameKey(game.season_id, game.home_team, game.away_team,
+            game.home_score, game.away_score, game.week, game.game_type, game.week_label)
+          existingScores.set(identity, JSON.stringify([game.home_score, game.away_score]))
           existingGameKeys.add(
             createGameKey(
               game.season_id,
@@ -461,18 +497,70 @@ export default async function initAddStatsPage() {
             .select('id, year')
             .eq('dynasty_id', dynasty.id)
             .eq('year', yearNumber)
-            .single()
 
-          if (seasonError || !seasonData) {
+          if (seasonError || !seasonData || seasonData.length !== 1) {
             failed++
-            errors.push(
-              `Row ${i + 1}: Season ${yearNumber} not found for "${dynastyName}".`
-            )
+            errors.push(`Row ${i + 1}: ${seasonError
+              ? `Could not load season: ${seasonError.message}`
+              : seasonData?.length
+                ? `Multiple seasons match ${yearNumber} for "${dynastyName}". Merge duplicates before importing.`
+                : `Season ${yearNumber} not found for "${dynastyName}". Create it in the Season tab first.`}`)
             continue
           }
 
-          season = seasonData as Season
+          season = seasonData[0] as Season
           seasonCache.set(seasonCacheKey, season)
+        }
+
+        /*
+         * Parse the game.
+         */
+        const gameInfo = getGameTypeInfoFromCSV(gameTypeRaw, weekRaw)
+
+        const homeScore =
+          homeScoreRaw === '' ? null : Number(homeScoreRaw)
+
+        const awayScore =
+          awayScoreRaw === '' ? null : Number(awayScoreRaw)
+
+        if (
+          homeScoreRaw !== '' &&
+          (!Number.isInteger(homeScore) || homeScore! < 0)
+        ) {
+          failed++
+          errors.push(`Row ${i + 1}: Invalid home score "${homeScoreRaw}".`)
+          continue
+        }
+
+        if (
+          awayScoreRaw !== '' &&
+          (!Number.isInteger(awayScore) || awayScore! < 0)
+        ) {
+          failed++
+          errors.push(`Row ${i + 1}: Invalid away score "${awayScoreRaw}".`)
+          continue
+        }
+
+        /*
+         * Prevent duplicate games when uploading the same CSV again.
+         */
+        const gameKey = createGameKey(
+          season.id,
+          canonicalHomeTeam,
+          canonicalAwayTeam,
+          homeScore,
+          awayScore,
+          gameInfo.week,
+          gameInfo.gameType,
+          gameInfo.weekLabel
+        )
+
+        if (existingGameKeys.has(gameKey)) {
+          if (existingScores.get(gameKey) !== JSON.stringify([homeScore, awayScore])) {
+            failed++
+            errors.push(`Row ${i + 1}: This matchup already exists with different scores. Correct it in Edit Stats before uploading.`)
+            continue
+          }
         }
 
         /*
@@ -576,22 +664,30 @@ export default async function initAddStatsPage() {
         /*
          * Resolve users.
          */
-        const homeProfile = findProfile(homeUser, profiles)
-        const awayProfile = findProfile(awayUser, profiles)
-
-        if (homeUser && !homeProfile) {
-          failed++
-          errors.push(
-            `Row ${i + 1}: Could not find home user "${homeUser}".`
-          )
-          continue
+        const resolveCoach = async (name: string): Promise<Profile | null> => {
+          if (!name) return null
+          const eligible = profiles.filter(p => !p.guest_dynasty_id || p.guest_dynasty_id === dynasty.id)
+          const existing = findProfile(name, eligible)
+          if (existing) return existing
+          // Never turn an unmatched email into a pretend login account.
+          if (name.includes('@')) throw new Error(`User email "${name}" not found. Use an existing email or a guest coach name.`)
+          const { data, error } = await supabase.from('profiles').insert({
+            id: crypto.randomUUID(), username: null, display_name: name,
+            guest_dynasty_id: dynasty.id, is_commissioner: false
+          }).select('id, username, display_name, guest_dynasty_id').single()
+          if (error) throw new Error(`Could not create guest coach "${name}": ${error.message}`)
+          const guest = data as Profile
+          profiles.push(guest)
+          return guest
         }
-
-        if (awayUser && !awayProfile) {
+        let homeProfile: Profile | null
+        let awayProfile: Profile | null
+        try {
+          homeProfile = await resolveCoach(homeUser)
+          awayProfile = await resolveCoach(awayUser)
+        } catch (error) {
           failed++
-          errors.push(
-            `Row ${i + 1}: Could not find away user "${awayUser}".`
-          )
+          errors.push(`Row ${i + 1}: ${error instanceof Error ? error.message : String(error)}`)
           continue
         }
 
@@ -607,8 +703,7 @@ export default async function initAddStatsPage() {
          * If blank:
          *     control_type = cpu
          *
-         * That means the CSV itself completely defines who controls
-         * each team for that season.
+         * Existing user assignments survive blank user cells.
          */
         const homeControlError = await upsertSeasonTeamControl(
           season.id,
@@ -638,49 +733,6 @@ export default async function initAddStatsPage() {
           continue
         }
 
-        /*
-         * Parse the game.
-         */
-        const gameInfo = getGameTypeInfoFromCSV(gameTypeRaw, weekRaw)
-
-        const homeScore =
-          homeScoreRaw === '' ? null : Number(homeScoreRaw)
-
-        const awayScore =
-          awayScoreRaw === '' ? null : Number(awayScoreRaw)
-
-        if (
-          homeScoreRaw !== '' &&
-          !Number.isFinite(homeScore)
-        ) {
-          failed++
-          errors.push(`Row ${i + 1}: Invalid home score "${homeScoreRaw}".`)
-          continue
-        }
-
-        if (
-          awayScoreRaw !== '' &&
-          !Number.isFinite(awayScore)
-        ) {
-          failed++
-          errors.push(`Row ${i + 1}: Invalid away score "${awayScoreRaw}".`)
-          continue
-        }
-
-        /*
-         * Prevent duplicate games when uploading the same CSV again.
-         */
-        const gameKey = createGameKey(
-          season.id,
-          canonicalHomeTeam,
-          canonicalAwayTeam,
-          homeScore,
-          awayScore,
-          gameInfo.week,
-          gameInfo.gameType,
-          gameInfo.weekLabel
-        )
-
         if (existingGameKeys.has(gameKey)) {
           skipped++
           continue
@@ -709,6 +761,7 @@ export default async function initAddStatsPage() {
         } else {
           succeeded++
           existingGameKeys.add(gameKey)
+          existingScores.set(gameKey, JSON.stringify([homeScore, awayScore]))
         }
       }
 
@@ -735,16 +788,23 @@ export default async function initAddStatsPage() {
       setStatus(
         summary +
         (errors.length > 0
-          ? ' Check the browser console for row details.'
+          ? ' Row details are shown below the upload buttons.'
           : ''),
         type
       )
 
+      if (errorPanel) errorPanel.textContent = errors.join('\n')
       if (errors.length > 0) {
         console.warn('CSV upload errors:', errors)
       }
 
-      ;(event.target as HTMLInputElement).value = ''
+      } catch (error) {
+        setStatus(`Import stopped: ${error instanceof Error ? error.message : String(error)}. Retry the CSV; existing games will be skipped.`, 'error')
+      } finally {
+        csvImportRunning = false
+        fileInput.disabled = false
+        fileInput.value = ''
+      }
     })
   }
 
@@ -786,27 +846,30 @@ export default async function initAddStatsPage() {
         return
       }
 
-      if (isCurrent) {
-        const { error: updateError } = await supabase
-          .from('seasons')
-          .update({ is_current: false })
-          .eq('dynasty_id', dynastyId)
-
-        if (updateError) {
-          setStatus(updateError.message, 'error')
-          return
-        }
+      const { data: existing, error: lookupError } = await supabase.from('seasons')
+        .select('id').eq('dynasty_id', dynastyId).eq('year', year)
+      if (lookupError || existing?.length) {
+        setStatus(lookupError?.message ?? `Season ${year} already exists. Use it instead of creating another.`, 'error')
+        return
       }
 
-      const { error } = await supabase.from('seasons').insert({
+      const { data: created, error } = await supabase.from('seasons').insert({
         dynasty_id: dynastyId,
         year,
         is_current: isCurrent
-      })
+      }).select('id').single()
 
-      if (error) {
-        setStatus(error.message, 'error')
+      if (error || !created) {
+        setStatus(error?.message ?? 'Could not create season.', 'error')
         return
+      }
+      if (isCurrent) {
+        const { error: updateError } = await supabase.from('seasons')
+          .update({ is_current: false }).eq('dynasty_id', dynastyId).neq('id', created.id)
+        if (updateError) {
+          setStatus(`Season created, but could not update the current-season flag: ${updateError.message}`, 'error')
+          return
+        }
       }
 
       setStatus('Season created.', 'success')
@@ -1401,6 +1464,7 @@ function findProfile(
 
     return (
       username === normalizedSearch ||
+      (normalizedSearch.length >= 3 && username.startsWith(normalizedSearch)) ||
       displayName === normalizedSearch
     )
   })
@@ -1448,6 +1512,13 @@ async function upsertSeasonTeamControl(
   teamId: string,
   profileId: string | null
 ): Promise<string | null> {
+  if (!profileId) {
+    const { error } = await supabase.from('season_team_control').upsert(
+      { season_id: seasonId, team_id: teamId, profile_id: null, control_type: 'cpu' },
+      { onConflict: 'season_id,team_id', ignoreDuplicates: true }
+    )
+    return error?.message ?? null
+  }
   const { error } = await supabase
     .from('season_team_control')
     .upsert(
@@ -1477,8 +1548,8 @@ function createGameKey(
   seasonId: string,
   homeTeam: string,
   awayTeam: string,
-  homeScore: number | null,
-  awayScore: number | null,
+  _homeScore: number | null,
+  _awayScore: number | null,
   week: number | null,
   gameType: string | null,
   weekLabel: string | null
@@ -1487,8 +1558,6 @@ function createGameKey(
     seasonId,
     homeTeam.trim().toLowerCase(),
     awayTeam.trim().toLowerCase(),
-    homeScore ?? '',
-    awayScore ?? '',
     week ?? '',
     (gameType ?? '').trim().toLowerCase(),
     (weekLabel ?? '').trim().toLowerCase()

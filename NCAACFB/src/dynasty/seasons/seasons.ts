@@ -147,7 +147,7 @@ async function init() {
         console.error("Error loading team controls:", controlsError);
     }
 
-    const controls = (teamControls ?? []) as TeamControl[];
+    const controls = (teamControls ?? []) as unknown as TeamControl[];
 
     const { data: teams, error: teamsError } = await supabase
         .from("teams")
